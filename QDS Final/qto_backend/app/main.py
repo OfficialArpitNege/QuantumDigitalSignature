@@ -156,12 +156,9 @@ def experiment(req: ExperimentRequest):
             expected_probs=expected["Z"]["probabilities"],
             observed_probs=observed["Z"]["probabilities"],
             qber=qb, fidelity=f,
-            forgery_probability=(1 - f) if req.attack == "forgery" else None,
-            verification_success_rate=f if req.attack in ("forgery", "impersonation") else None,
-            identity_failure_rate=(1 - f) if req.attack == "impersonation" else None,
             duplicate_detected=(req.attack == "replay"),
             freshness_ok=(req.attack != "replay"),
-            attack_type=req.attack
+            attack_type="auto"
         )
         results.append({
             "index": idx, "source_bit": bit,
