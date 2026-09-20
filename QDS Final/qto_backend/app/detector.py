@@ -1,38 +1,66 @@
 from .stats import total_variation, js_divergence, vector_deviation, weighted_score
 
-def classify_attack_automatically(expected, observed, vector_dev, tv, qber, duplicate_detected, freshness_ok):
+def classify_attack_automatically(
+    expected,
+    observed,
+    vector_dev,
+    tv,
+    qber,
+    duplicate_detected,
+    freshness_ok,
+    signature_valid=True,
+    identity_valid=True,
+    quantum_valid=True,
+    unauthorized_attempt=False,
+):
+    # 1. Replay attack: session nonce replayed or duplicate detected
     if duplicate_detected or not freshness_ok:
         return "replay"
 
-    if vector_dev < 0.15 and tv < 0.15:
-        return "none"
-
-    dx = abs(float(expected.get("X", 0.0)) - float(observed.get("X", 0.0)))
-    dy = abs(float(expected.get("Y", 0.0)) - float(observed.get("Y", 0.0)))
-
-    # Composite rotation affects both X and Y axes
-    if dx > 0.1 and dy > 0.1:
-        return "impersonation"
-    # Rx rotation affects Y-axis and Z-axis (causing QBER)
-    elif dy > dx + 0.05 or (qber is not None and qber > 0.2):
-        return "channel_manipulation"
-    # Ry rotation affects X-axis and Z-axis
-    else:
+    # 2. Forgery attack: HMAC classical signature fails
+    if not signature_valid:
         return "forgery"
+
+    # 3. Impersonation attack: Alice identity verification fails
+    if not identity_valid:
+        return "impersonation"
+
+    # 4. Unauthorized verification attack
+    if unauthorized_attempt:
+        return "unauthorized_verification"
+
+    # 5. Quantum Channel Manipulation / Noise: Quantum state perturbed / fidelity loss / high QBER
+    if not quantum_valid or vector_dev > 0.15 or tv > 0.15 or (qber is not None and qber > 0.01):
+        dx = abs(float(expected.get("X", 0.0)) - float(observed.get("X", 0.0)))
+        dy = abs(float(expected.get("Y", 0.0)) - float(observed.get("Y", 0.0)))
+
+        if dx > 0.1 and dy > 0.1:
+            return "impersonation"
+        elif dy > dx + 0.05 or (qber is not None and qber > 0.05):
+            return "channel_manipulation"
+        else:
+            return "forgery"
+
+    # 6. Clean transmission: All verification gates passed, no statistical anomalies
+    return "none"
 
 def detect(expected, observed, expected_probs=None, observed_probs=None,
            qber=None, fidelity=None, forgery_probability=None,
            verification_success_rate=None, identity_failure_rate=None,
-           duplicate_detected=False, freshness_ok=True, attack_type=None):
+           duplicate_detected=False, freshness_ok=True, attack_type=None,
+           signature_valid=True, identity_valid=True, quantum_valid=True,
+           unauthorized_attempt=False):
     vector_dev = vector_deviation(expected, observed)
     norm_dev = min(1.0, vector_dev / 2.0)
     tv = total_variation(expected_probs or {}, observed_probs or {}) if expected_probs is not None and observed_probs is not None else 0.0
     jsd = js_divergence(expected_probs or {}, observed_probs or {}) if expected_probs is not None and observed_probs is not None else 0.0
 
-    # Automate attack classification if not explicitly overridden
+    # Always classify attack automatically from evidence (attack-blind detection)
     classified_attack = classify_attack_automatically(
-        expected, observed, vector_dev, tv, qber, duplicate_detected, freshness_ok
-    ) if attack_type is None or attack_type == "auto" else attack_type
+        expected, observed, vector_dev, tv, qber, duplicate_detected, freshness_ok,
+        signature_valid=signature_valid, identity_valid=identity_valid,
+        quantum_valid=quantum_valid, unauthorized_attempt=unauthorized_attempt
+    )
 
     if classified_attack == "forgery":
         evidence = {
@@ -89,6 +117,6 @@ def detect(expected, observed, expected_probs=None, observed_probs=None,
         "raw_vector_deviation": vector_dev,
         "distribution_total_variation": tv,
         "jensen_shannon_divergence": jsd,
-        "note": "Threat engine automatically classified attack vector from quantum measurement evidence."
+        "note": "Threat engine automatically classified attack vector from quantum & gate evidence."
     }
 

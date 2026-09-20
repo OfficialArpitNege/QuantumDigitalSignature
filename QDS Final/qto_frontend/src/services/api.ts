@@ -6,8 +6,10 @@ import type {
   SignResponse,
   TeleportRequest,
   TeleportResponse,
-  AttackRequest,
-  AttackResponse,
+  ProtocolExecuteResponse,
+  FullPipelineResponse,
+  PerformanceBenchmarkResponse,
+  ForgeryBenchmarkResponse,
 } from '../types/api';
 
 const BASE_URL = (import.meta.env.VITE_API_BASE_URL as string) || 'http://127.0.0.1:8000';
@@ -37,12 +39,24 @@ async function get<T>(path: string): Promise<T> {
 
 export const api = {
   checkHealth: () => get<HealthResponse>('/health'),
+
+  // Phase 12: primary full-pipeline endpoint (single call for all results)
+  runFullPipeline: (req: ExperimentRequest) =>
+    post<FullPipelineResponse>('/api/v1/protocol/full', req),
+
+  // Legacy endpoints — preserved for backward compatibility and diagnostics
   runExperiment: (req: ExperimentRequest) =>
     post<ExperimentResponse>('/api/v1/experiment', req),
+  executeProtocol: (req: ExperimentRequest) =>
+    post<ProtocolExecuteResponse>('/api/v1/protocol/execute', req),
   signMessage: (req: SignRequest) =>
     post<SignResponse>('/api/v1/sign', req),
   teleportQubit: (req: TeleportRequest) =>
     post<TeleportResponse>('/api/v1/teleport', req),
-  simulateAttack: (req: AttackRequest) =>
-    post<AttackResponse>('/api/v1/attack', req),
+  // Phase 15: Research Evaluation & Benchmarks
+  runPerformanceBenchmark: (trialsPerScenario = 5) =>
+    post<PerformanceBenchmarkResponse>('/api/v1/performance/benchmark', { trials_per_scenario: trialsPerScenario }),
+  runForgeryExperiment: (totalAttempts = 25) =>
+    post<ForgeryBenchmarkResponse>('/api/v1/experiment/forgery', { total_attempts: totalAttempts }),
 };
+

@@ -1,0 +1,176 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --bg: #f6f8fb;
+  --bg-2: #eef2f8;
+  --glass: rgba(255, 255, 255, 0.55);
+  --glass-border: rgba(15, 30, 50, 0.08);
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg: #0b1220;
+    --bg-2: #0e1626;
+    --glass: rgba(20, 28, 44, 0.55);
+    --glass-border: rgba(255, 255, 255, 0.08);
+  }
+}
+
+/* ------------------------------------------------------------------ */
+/* Unified typography system                                          */
+/* ------------------------------------------------------------------ */
+.landing-root {
+  margin: 0;
+  padding: 0;
+  background: var(--bg);
+  color: #0e1b2a;
+  font-family: 'Space Grotesk', 'IBM Plex Sans', system-ui, sans-serif;
+  overflow-x: hidden;
+  min-height: 100vh;
+  position: relative;
+  line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+@media (prefers-color-scheme: dark) {
+  .landing-root {
+    color: #eef3fb;
+  }
+}
+
+/* ------------------------------------------------------------------ */
+/* Glass panel — generous padding, spacing & breathing room            */
+/* ------------------------------------------------------------------ */
+.glass-panel {
+  background: var(--glass);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid var(--glass-border);
+  border-radius: 20px;
+  box-shadow: 0 24px 64px rgba(10, 20, 40, 0.1);
+  padding: 38px 44px;
+}
+
+/* Children inside glass panels get consistent vertical rhythm */
+.glass-panel > * + * {
+  margin-top: 0;
+}
+
+.glass-panel h1,
+.glass-panel h2 {
+  font-family: 'Space Grotesk', sans-serif;
+  line-height: 1.2;
+}
+
+.glass-panel p {
+  font-family: 'Space Grotesk', 'IBM Plex Sans', sans-serif;
+  line-height: 1.7;
+}
+
+/* ------------------------------------------------------------------ */
+/* Canvas                                                             */
+/* ------------------------------------------------------------------ */
+.canvas-fixed {
+  position: fixed;
+  inset: 0;
+  z-index: 1;
+  background: linear-gradient(180deg, var(--bg), var(--bg-2));
+}
+
+.scroller {
+  position: relative;
+  z-index: 2;
+}
+
+/* ------------------------------------------------------------------ */
+/* Eyebrow label                                                      */
+/* ------------------------------------------------------------------ */
+.eyebrow {
+  font-family: 'IBM Plex Mono', 'Space Grotesk', monospace;
+  font-size: 12.5px;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  opacity: 0.88;
+  margin-bottom: 14px;
+}
+
+/* ------------------------------------------------------------------ */
+/* Decision steps                                                     */
+/* ------------------------------------------------------------------ */
+.decision-step {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 13px;
+  letter-spacing: 0.08em;
+  opacity: 0.4;
+  transition: opacity 0.4s ease, color 0.4s ease;
+}
+.decision-step.active {
+  opacity: 1;
+}
+
+/* ------------------------------------------------------------------ */
+/* CTA button — generous padding & spacing                            */
+/* ------------------------------------------------------------------ */
+.cta-button {
+  pointer-events: auto;
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  background: #0e1b2a;
+  color: var(--bg);
+  font-family: 'Space Grotesk', sans-serif;
+  font-weight: 600;
+  font-size: 15px;
+  padding: 16px 32px;
+  border-radius: 100px;
+  border: none;
+  cursor: pointer;
+  transition: transform 0.25s ease, box-shadow 0.25s ease;
+}
+.cta-button:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 12px 30px rgba(20, 30, 50, 0.25);
+}
+
+@media (prefers-color-scheme: dark) {
+  .cta-button {
+    background: #eef3fb;
+    color: #0b1220;
+  }
+}
+
+/* ------------------------------------------------------------------ */
+/* Responsive rules                                                   */
+/* ------------------------------------------------------------------ */
+
+/* Tablet and below */
+@media (max-width: 768px) {
+  .glass-panel {
+    padding: 22px 24px;
+    border-radius: 14px;
+    max-width: 100% !important;
+  }
+
+  .cta-button {
+    font-size: 14px;
+    padding: 12px 22px;
+  }
+}
+
+/* Mobile */
+@media (max-width: 480px) {
+  .glass-panel {
+    padding: 18px 20px;
+    border-radius: 12px;
+  }
+
+  .cta-button {
+    font-size: 13px;
+    padding: 11px 20px;
+    width: 100%;
+    justify-content: center;
+  }
+}

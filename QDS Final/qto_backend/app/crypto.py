@@ -1,3 +1,7 @@
+"""
+Prototype classical signing/authentication layer using SHA-256 and HMAC-SHA256
+(used as a classical prototype signing layer, not an information-theoretically secure QDS scheme).
+"""
 import hashlib
 import hmac
 import secrets

@@ -49,3 +49,17 @@ class ExperimentRequest(BaseModel):
     attack_strength: float = Field(default=0.25, ge=0.0, le=1.0)
     shots: int = Field(default=2048, ge=100, le=100000)
     max_symbols: int = Field(default=4, ge=1, le=8)
+
+class PerformanceBenchmarkRequest(BaseModel):
+    trials_per_scenario: int = Field(default=10, ge=1, le=100)
+    shots: int = Field(default=1024, ge=100, le=10000)
+    max_symbols: int = Field(default=4, ge=1, le=8)
+    attack_strength: float = Field(default=0.5, ge=0.0, le=1.0)
+
+class ForgeryExperimentRequest(BaseModel):
+    total_attempts: int = Field(default=50, ge=0, le=1000)
+    shots: int = Field(default=1024, ge=100, le=10000)
+    max_symbols: int = Field(default=4, ge=1, le=8)
+    attack_strength: float = Field(default=0.5, ge=0.0, le=1.0)
+
+
