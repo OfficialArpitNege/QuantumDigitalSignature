@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, NavLink } from 'react-router-dom';
 import { api } from '../services/api';
 import ThemeToggle from './ThemeToggle';
 import type { Theme } from './ThemeToggle';
@@ -36,6 +36,13 @@ export default function Header({
 
   useEffect(() => { check(); }, []);
 
+  const navTabs = [
+    { label: 'EXPERIMENT', path: '/simulator', end: true, icon: '🧪' },
+    { label: 'ANALYSIS', path: '/simulator/analysis', end: false, icon: '🔍' },
+    { label: 'QUANTUM DATA', path: '/simulator/quantum', end: false, icon: '⚛' },
+    { label: 'RESEARCH', path: '/simulator/research', end: false, icon: '📊' },
+  ];
+
   return (
     <header style={{
       background: 'var(--lab-surface)',
@@ -53,20 +60,20 @@ export default function Header({
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'space-between',
-          padding: '14px 0',
+          padding: '12px 0',
           gap: 16,
           flexWrap: 'wrap',
         }}>
           {/* Left: Brand + Section title */}
-          <div style={{ display: 'flex', alignItems: 'center', gap: 16 }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 14 }}>
             <button
               onClick={() => navigate('/')}
               style={{
                 background: 'rgba(31, 182, 214, 0.1)',
                 border: '1px solid var(--lab-border)',
                 borderRadius: 100,
-                padding: '6px 16px',
-                fontSize: 13,
+                padding: '5px 14px',
+                fontSize: 12,
                 fontWeight: 600,
                 color: 'var(--lab-text)',
                 cursor: 'pointer',
@@ -81,22 +88,52 @@ export default function Header({
               ← Back to Home
             </button>
 
-            <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
               <span className="font-display font-semibold text-base tracking-wide whitespace-nowrap">
-                QUANTUM<span style={{ color: '#1fb6d6' }}>·</span>NET
-              </span>
-              <span style={{ color: 'var(--lab-border)', fontSize: 16 }}>|</span>
-              <span style={{
-                fontSize: 13,
-                fontWeight: 700,
-                letterSpacing: '0.04em',
-                textTransform: 'uppercase',
-                color: 'var(--lab-text-sub)',
-              }}>
-                Security Lab
+                QUANTUM<span style={{ color: '#cc0000' }}>·</span>NET
               </span>
             </div>
           </div>
+
+          {/* Center: Lab Navigation Tabs */}
+          <nav className="lab-nav-tabs" style={{
+            display: 'flex',
+            alignItems: 'center',
+            gap: 6,
+            background: 'var(--lab-surface-2)',
+            border: '1px solid var(--lab-border)',
+            padding: '4px 6px',
+            borderRadius: 100,
+          }}>
+            {navTabs.map(tab => (
+              <NavLink
+                key={tab.path}
+                to={tab.path}
+                end={tab.end}
+                className={({ isActive }) => `lab-nav-tab ${isActive ? 'active' : ''}`}
+                style={({ isActive }) => ({
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  gap: 6,
+                  padding: '6px 14px',
+                  borderRadius: 100,
+                  fontSize: 11,
+                  fontWeight: 800,
+                  letterSpacing: '0.06em',
+                  textDecoration: 'none',
+                  transition: 'all 0.2s ease',
+                  color: isActive ? '#ffffff' : 'var(--lab-text-sub)',
+                  background: isActive
+                    ? 'linear-gradient(135deg, #cc0000 0%, #8a0000 100%)'
+                    : 'transparent',
+                  boxShadow: isActive ? '0 2px 10px rgba(204, 0, 0, 0.3)' : 'none',
+                })}
+              >
+                <span style={{ fontSize: 12 }}>{tab.icon}</span>
+                <span>{tab.label}</span>
+              </NavLink>
+            ))}
+          </nav>
 
           {/* Right: Actions + Backend Status + Theme Toggle */}
           <div style={{ display: 'flex', alignItems: 'center', gap: 12, flexWrap: 'wrap' }}>
@@ -104,9 +141,9 @@ export default function Header({
               <button
                 onClick={onOpenHowItWorks}
                 style={{
-                  background: 'rgba(31, 182, 214, 0.12)',
-                  border: '1px solid rgba(31, 182, 214, 0.3)',
-                  color: '#1fb6d6',
+                  background: 'rgba(204, 0, 0, 0.08)',
+                  border: '1px solid rgba(204, 0, 0, 0.3)',
+                  color: '#cc0000',
                   padding: '6px 14px',
                   borderRadius: 100,
                   fontSize: 12,
@@ -166,3 +203,4 @@ export default function Header({
     </header>
   );
 }
+
