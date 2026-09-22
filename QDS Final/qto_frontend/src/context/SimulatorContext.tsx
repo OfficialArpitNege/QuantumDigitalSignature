@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useState, useCallback, useEffect, useRef } from 'react';
+import React, { createContext, useContext, useState, useCallback, useEffect } from 'react';
 import type { ExtendedAttackType } from '../components/JudgeDemo/ScenarioSelector';
 import type {
   AttackType,
@@ -21,8 +21,6 @@ function makePipeline(hasAnomaly: boolean): PipelineState {
   stages.push({ status: (hasAnomaly ? 'anomaly' : 'complete') as PipelineStatus });
   return { stages };
 }
-
-const TIMELINE_STEPS = 9;
 
 interface SimulatorContextType {
   // Scenario / Config state
@@ -92,9 +90,6 @@ export const SimulatorProvider: React.FC<{ children: React.ReactNode }> = ({ chi
   const [checksRevealed, setChecksRevealed] = useState(0);
   const [pipeline, setPipeline] = useState<PipelineState>(IDLE_PIPELINE);
 
-  const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
-  const checkRevealRef = useRef<ReturnType<typeof setInterval> | null>(null);
-
   // Responses
   const [fullPipelineData, setFullPipelineData] = useState<FullPipelineResponse | null>(null);
   const [experimentData, setExperimentData] = useState<ExperimentResponse | null>(null);
@@ -163,36 +158,16 @@ export const SimulatorProvider: React.FC<{ children: React.ReactNode }> = ({ chi
     return scenarioAttack as AttackType;
   }, [scenarioAttack]);
 
-  useEffect(() => {
-    if (loading) {
-      setStepIndex(0);
-      setChecksRevealed(0);
-      intervalRef.current = setInterval(() => {
-        setStepIndex(prev => Math.min(prev + 1, TIMELINE_STEPS - 1));
-      }, 420);
-    } else {
-      if (intervalRef.current) { clearInterval(intervalRef.current); intervalRef.current = null; }
-      if (fullPipelineData) {
-        setStepIndex(TIMELINE_STEPS);
-        setChecksRevealed(0);
-        let count = 0;
-        checkRevealRef.current = setInterval(() => {
-          count++;
-          setChecksRevealed(count);
-          if (count >= 4) { clearInterval(checkRevealRef.current!); checkRevealRef.current = null; }
-        }, 250);
-      } else {
-        setStepIndex(-1);
-      }
-    }
-    return () => {
-      if (intervalRef.current) clearInterval(intervalRef.current);
-    };
-  }, [loading, fullPipelineData]);
+  const STAGE_DURATIONS = [
+    1400, // 0: SIGN
+    1400, // 1: ENCODE
+    2600, // 2: TRANSMIT (Hero Quantum Channel Transfer)
+    1800, // 3: ANALYZE
+    1600, // 4: DECIDE
+    1400, // 5: VERIFY
+  ];
 
-  useEffect(() => {
-    return () => { if (checkRevealRef.current) clearInterval(checkRevealRef.current); };
-  }, []);
+  const sleep = (ms: number) => new Promise(resolve => setTimeout(resolve, ms));
 
   const resetResults = useCallback(() => {
     setFullPipelineData(null);
@@ -211,36 +186,73 @@ export const SimulatorProvider: React.FC<{ children: React.ReactNode }> = ({ chi
   }, [resetResults]);
 
   const runProtocol = async () => {
-    if (!message.trim()) return;
+    if (!message.trim() || loading) return;
     resetResults();
     setLoading(true);
     setPipeline({ stages: [{ status: 'active' }, ...Array(8).fill({ status: 'idle' })] });
 
-    try {
-      const attack = backendAttack();
-      const reqBody = {
-        message,
-        attack,
-        attack_strength: attackStrength,
-        shots,
-        max_symbols: maxSymbols,
-      };
+    const attack = backendAttack();
+    const reqBody = {
+      message,
+      attack,
+      attack_strength: attackStrength,
+      shots,
+      max_symbols: maxSymbols,
+    };
 
-      const fullRes = await api.runFullPipeline(reqBody);
+    // Initiate backend API requests in parallel
+    const pipelinePromise = api.runFullPipeline(reqBody);
+    const experimentAttack = attack === 'unauthorized_verification'
+      ? ({ ...reqBody, attack: 'none' as AttackType })
+      : reqBody;
+
+    const secondaryPromises = Promise.all([
+      api.signMessage({ message, max_symbols: maxSymbols }),
+      api.runExperiment(experimentAttack),
+    ]);
+
+    try {
+      // Step 0: SIGN
+      setStepIndex(0);
+      await sleep(STAGE_DURATIONS[0]);
+
+      // Step 1: ENCODE
+      setStepIndex(1);
+      await sleep(STAGE_DURATIONS[1]);
+
+      // Step 2: TRANSMIT (Hero Stage — Quantum channel active)
+      setStepIndex(2);
+      await sleep(STAGE_DURATIONS[2]);
+
+      // Step 3: ANALYZE
+      setStepIndex(3);
+      await sleep(STAGE_DURATIONS[3]);
+
+      // Await actual API result from backend
+      const fullRes = await pipelinePromise;
       setFullPipelineData(fullRes);
 
-      const experimentAttack = attack === 'unauthorized_verification'
-        ? ({ ...reqBody, attack: 'none' as AttackType })
-        : reqBody;
-
-      Promise.all([
-        api.signMessage({ message, max_symbols: maxSymbols }),
-        api.runExperiment(experimentAttack),
-      ]).then(([signRes, expRes]) => {
+      secondaryPromises.then(([signRes, expRes]) => {
         setSignData(signRes);
         setExperimentData(expRes);
       }).catch(() => { });
 
+      // Step 4: DECIDE — Reveals verification gates one by one
+      setStepIndex(4);
+      setChecksRevealed(0);
+      for (let i = 1; i <= 4; i++) {
+        await sleep(350);
+        setChecksRevealed(i);
+      }
+      await sleep(400);
+
+      // Step 5: VERIFY
+      setStepIndex(5);
+      await sleep(STAGE_DURATIONS[5]);
+
+      // Complete
+      setStepIndex(6);
+      setChecksRevealed(4);
       const hasAnomaly = fullRes.verification.decision === 'REJECT';
       setPipeline(makePipeline(hasAnomaly));
 
@@ -248,10 +260,12 @@ export const SimulatorProvider: React.FC<{ children: React.ReactNode }> = ({ chi
       const msg = e instanceof Error ? e.message : String(e);
       setError(msg);
       setPipeline(IDLE_PIPELINE);
+      setStepIndex(-1);
     } finally {
       setLoading(false);
     }
   };
+
 
   const runResearchBenchmarks = async () => {
     setBenchmarkLoading(true);

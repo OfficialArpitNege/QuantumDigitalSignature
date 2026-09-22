@@ -2,6 +2,7 @@ import { useNavigate } from 'react-router-dom';
 import { useSimulator } from '../../context/SimulatorContext';
 import ScenarioSelector from '../../components/JudgeDemo/ScenarioSelector';
 import ProtocolNetwork from '../../components/JudgeDemo/ProtocolNetwork';
+import ProtocolProcessFlow from '../../components/JudgeDemo/ProtocolProcessFlow';
 import LoadingState from '../../components/LoadingState';
 import ErrorState from '../../components/ErrorState';
 
@@ -23,6 +24,7 @@ export default function ExperimentPage() {
     loading,
     error,
     stepIndex,
+    checksRevealed,
     runProtocol,
     fullPipelineData,
     setShowModal,
@@ -103,6 +105,17 @@ export default function ExperimentPage() {
           verdict={verdict}
         />
 
+        {/* 3. Real-Time Protocol Execution Flow */}
+        <ProtocolProcessFlow
+          stepIndex={stepIndex}
+          isRunning={loading}
+          isDone={isDone}
+          verdict={verdict}
+          verification={fullPipelineData?.verification}
+          checksRevealed={checksRevealed}
+        />
+
+
         {/* 3. Message Console & Primary Action Button */}
         <div style={{
           background: 'var(--lab-surface-2)',
@@ -118,7 +131,7 @@ export default function ExperimentPage() {
           <div style={{ flex: 1, minWidth: 260 }}>
             <label style={{
               fontSize: 11, fontWeight: 800, textTransform: 'uppercase',
-              letterSpacing: '0.12em', color: '#cc0000', display: 'block', marginBottom: 6,
+              letterSpacing: '0.12em', color: '#1fb6d6', display: 'block', marginBottom: 6,
               fontFamily: "'IBM Plex Mono', monospace",
             }}>Alice's Message Payload</label>
             <input
@@ -147,14 +160,14 @@ export default function ExperimentPage() {
           {/* Attack Strength slider if attack selected */}
           {scenarioAttack !== 'none' && (
             <div style={{ minWidth: 160 }}>
-              <label style={{ fontSize: 11, fontWeight: 800, textTransform: 'uppercase', letterSpacing: '0.08em', color: '#ef4444', display: 'block', marginBottom: 6 }}>
+              <label style={{ fontSize: 11, fontWeight: 800, textTransform: 'uppercase', letterSpacing: '0.08em', color: 'var(--lab-text)', display: 'block', marginBottom: 6 }}>
                 Attack Intensity: {(attackStrength * 100).toFixed(0)}%
               </label>
               <input
                 type="range" min="0.1" max="1.0" step="0.05"
                 value={attackStrength}
                 onChange={e => setAttackStrength(parseFloat(e.target.value))}
-                style={{ width: '100%', accentColor: '#ef4444' }}
+                style={{ width: '100%', accentColor: '#1fb6d6' }}
               />
             </div>
           )}
@@ -168,14 +181,13 @@ export default function ExperimentPage() {
             style={{
               background: loading
                 ? '#64748b'
-                : scenarioAttack === 'none'
-                  ? 'linear-gradient(135deg, #cc0000 0%, #8a0000 100%)'
-                  : 'linear-gradient(135deg, #ef4444 0%, #b91c1c 100%)',
+                : 'linear-gradient(135deg, #1fb6d6 0%, #1e40af 100%)',
+              boxShadow: loading ? 'none' : '0 8px 24px rgba(31, 182, 214, 0.35)',
             }}
           >
             {loading
               ? <><span style={{ animation: 'qds-spin 0.7s linear infinite', display: 'inline-block' }}>⚙</span> Executing Quantum Protocol…</>
-              : <>▶ RUN PROTOCOL{scenarioAttack !== 'none' ? ' + ATTACK' : ''}</>
+              : <>▶ RUN PROTOCOL</>
             }
           </button>
 

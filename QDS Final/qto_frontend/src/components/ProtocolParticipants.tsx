@@ -2,10 +2,11 @@ import type { AttackType } from '../types/api';
 
 interface Props {
   attackType: AttackType;
+  isThreatDetected?: boolean;
 }
 
-export default function ProtocolParticipants({ attackType }: Props) {
-  const isAttackActive = attackType !== 'none';
+export default function ProtocolParticipants({ attackType, isThreatDetected = false }: Props) {
+  const isAttackConfigured = attackType !== 'none';
   const formatAttackName = (a: string) =>
     a === 'none' ? 'None' : a.replace(/_/g, ' ').replace(/\b\w/g, c => c.toUpperCase());
 
@@ -51,10 +52,10 @@ export default function ProtocolParticipants({ attackType }: Props) {
           {/* Channel Arrow + Interceptor */}
           <div style={{ flex: 1, textAlign: 'center', position: 'relative', padding: '0 12px' }}>
             <div style={{ fontSize: 11, fontWeight: 700, color: 'var(--text-secondary)', marginBottom: 6 }}>
-              {isAttackActive ? `Quantum Channel (Interception: ${formatAttackName(attackType)})` : 'Secure Quantum & Classical Channel'}
+              {isThreatDetected ? `⚠ Anomaly Intercepted (${formatAttackName(attackType)})` : isAttackConfigured ? `Quantum Channel (Scenario: ${formatAttackName(attackType)})` : 'Secure Quantum & Classical Channel'}
             </div>
             
-            <div style={{ height: 4, background: isAttackActive ? '#ef4444' : '#10b981', borderRadius: 2, position: 'relative' }}>
+            <div style={{ height: 4, background: isThreatDetected ? '#ef4444' : '#10b981', borderRadius: 2, position: 'relative' }}>
               <div
                 style={{
                   position: 'absolute',
@@ -64,27 +65,27 @@ export default function ProtocolParticipants({ attackType }: Props) {
                   height: 0,
                   borderTop: '7px solid transparent',
                   borderBottom: '7px solid transparent',
-                  borderLeft: `10px solid ${isAttackActive ? '#ef4444' : '#10b981'}`,
+                  borderLeft: `10px solid ${isThreatDetected ? '#ef4444' : '#10b981'}`,
                 }}
               />
             </div>
 
-            {/* Eve interceptor indicator if active */}
-            {isAttackActive && (
+            {/* Eve interceptor indicator if threat detected */}
+            {isAttackConfigured && (
               <div
                 style={{
                   marginTop: 8,
                   display: 'inline-block',
-                  background: '#fef2f2',
-                  border: '1px solid #fecaca',
+                  background: isThreatDetected ? '#fef2f2' : '#f1f5f9',
+                  border: `1px solid ${isThreatDetected ? '#fecaca' : '#cbd5e1'}`,
                   borderRadius: 16,
                   padding: '4px 12px',
                   fontSize: 11,
                   fontWeight: 700,
-                  color: '#dc2626',
+                  color: isThreatDetected ? '#dc2626' : '#475569',
                 }}
               >
-                🕵️‍♀️ Eve ({formatAttackName(attackType)}) Intercepting
+                🕵️‍♀️ Eve ({formatAttackName(attackType)}) {isThreatDetected ? 'Threat Intercepted' : 'Channel Tapped'}
               </div>
             )}
           </div>
@@ -147,29 +148,29 @@ export default function ProtocolParticipants({ attackType }: Props) {
         </div>
 
         {/* Eve Card */}
-        <div className="card" style={{ borderTop: `4px solid ${isAttackActive ? '#ef4444' : '#94a3b8'}` }}>
+        <div className="card" style={{ borderTop: `4px solid ${isThreatDetected ? '#ef4444' : '#94a3b8'}` }}>
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 10 }}>
             <span style={{ fontWeight: 800, fontSize: 16 }}>Eve</span>
             <span
               style={{
                 fontSize: 11,
                 fontWeight: 700,
-                background: isAttackActive ? '#fee2e2' : '#f1f5f9',
-                color: isAttackActive ? '#b91c1c' : '#64748b',
+                background: isThreatDetected ? '#fee2e2' : '#f1f5f9',
+                color: isThreatDetected ? '#b91c1c' : '#64748b',
                 padding: '2px 8px',
                 borderRadius: 12,
               }}
             >
-              {isAttackActive ? 'ACTIVE' : 'INACTIVE'}
+              {isThreatDetected ? 'THREAT DETECTED' : isAttackConfigured ? 'CONFIGURED' : 'INACTIVE'}
             </span>
           </div>
-          <div style={{ fontSize: 12, fontWeight: 700, color: isAttackActive ? '#dc2626' : '#64748b', marginBottom: 8 }}>
+          <div style={{ fontSize: 12, fontWeight: 700, color: isThreatDetected ? '#dc2626' : '#64748b', marginBottom: 8 }}>
             Attacker / Interceptor
           </div>
           <ul style={{ fontSize: 12, color: 'var(--text-secondary)', paddingLeft: 16, margin: 0, lineHeight: 1.5 }}>
             <li>Attempts forgery, impersonation, or replay attacks</li>
             <li>Injects quantum channel state perturbations</li>
-            <li>Status: {isAttackActive ? `Active (${formatAttackName(attackType)})` : 'Inactive (No Attack Selected)'}</li>
+            <li>Status: {isThreatDetected ? `⚠ Anomaly Detected (${formatAttackName(attackType)})` : isAttackConfigured ? `Configured Scenario (${formatAttackName(attackType)})` : 'Inactive (No Attack Selected)'}</li>
           </ul>
         </div>
       </div>
