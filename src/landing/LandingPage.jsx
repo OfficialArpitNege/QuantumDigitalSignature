@@ -6,6 +6,7 @@ import Scene from './components/Scene.jsx';
 import Nav from './components/Nav.jsx';
 import StatsPanel from './sections/StatsPanel.jsx';
 import DecisionSection from './sections/DecisionSection.jsx';
+import TransitionPage from '../pages/TransitionPage.jsx';
 import { setProgress, subscribe, scrollStore } from './scrollStore.js';
 import './landing.css';
 
@@ -14,6 +15,7 @@ gsap.registerPlugin(ScrollTrigger);
 export default function LandingPage() {
   const navigate = useNavigate();
   const [hasScrolled, setHasScrolled] = useState(false);
+  const [isTransitioning, setIsTransitioning] = useState(false);
 
   useEffect(() => {
     const trigger = ScrollTrigger.create({
@@ -40,15 +42,29 @@ export default function LandingPage() {
     });
   };
 
-  const launchSimulator = () => {
-    window.scrollTo({ top: 0, left: 0, behavior: 'instant' });
+  const handleLaunchSimulator = () => {
+    if (isTransitioning) return;
+    setIsTransitioning(true);
+  };
+
+  const handleTransitionComplete = () => {
+    setIsTransitioning(false);
     navigate('/simulator');
   };
 
   return (
-    <div className="landing-root">
-      <Nav />
-      <Scene />
+    <>
+      <div
+        className="landing-root"
+        style={{
+          filter: isTransitioning ? 'blur(10px) brightness(0.7)' : 'none',
+          transition: 'filter 0.45s ease',
+          pointerEvents: isTransitioning ? 'none' : 'auto',
+          userSelect: isTransitioning ? 'none' : 'auto',
+        }}
+      >
+        <Nav onLaunchSimulator={handleLaunchSimulator} />
+        <Scene />
 
       <div className="scroller">
         {/* 0. Hero */}
@@ -66,7 +82,7 @@ export default function LandingPage() {
                   Explore Pipeline ↓
                 </button>
                 <button
-                  onClick={launchSimulator}
+                  onClick={handleLaunchSimulator}
                   className="cta-button"
                   style={{
                     background: '#1D4ED8',
@@ -231,7 +247,7 @@ export default function LandingPage() {
               Legitimate communication is accepted, while anomalous behaviour is detected, classified, and recorded in a tamper-evident audit layer for defense, government, and financial operations.
             </p>
             <button
-              onClick={launchSimulator}
+              onClick={handleLaunchSimulator}
               className="cta-button"
               style={{
                 background: '#1D4ED8',
@@ -252,7 +268,12 @@ export default function LandingPage() {
           Reduced-motion mode: animations simplified.
         </p>
       )}
-    </div>
+      </div>
+
+      {isTransitioning && (
+        <TransitionPage isModal={true} onComplete={handleTransitionComplete} />
+      )}
+    </>
   );
 }
 

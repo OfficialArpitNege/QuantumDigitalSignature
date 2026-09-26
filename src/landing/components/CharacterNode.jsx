@@ -1,21 +1,31 @@
 import { useRef } from 'react';
 import { useFrame } from '@react-three/fiber';
 import { Html } from '@react-three/drei';
+import { scrollStore } from '../scrollStore.js';
 
 /**
  * A consistent "character" built entirely from primitives so Sender, Receiver and
  * Attacker share one visual language: a glowing icosahedron core wrapped in two
- * crossed halo rings and a point light, distinguished only by color and
- * intensity. `pulse` (0..1) drives extra emissive/scale energy, used for
- * Attacker's interference spike during the threat-detection stage.
+ * crossed halo rings and a point light. Supports optional fadeStart/fadeEnd
+ * for scroll-driven fadeout at section transitions.
  */
-export default function CharacterNode({ position, color, glowColor, scale = 1, pulseRef, label }) {
+export default function CharacterNode({
+  position,
+  color,
+  glowColor,
+  scale = 1,
+  pulseRef,
+  label,
+  fadeStart,
+  fadeEnd,
+}) {
   const core = useRef();
   const halo1 = useRef();
   const halo2 = useRef();
   const group = useRef();
+  const labelRef = useRef();
 
-  useFrame((_, delta) => {
+  useFrame(() => {
     const t = performance.now() * 0.001;
     if (core.current) {
       core.current.rotation.y = t * 0.4;
@@ -25,12 +35,27 @@ export default function CharacterNode({ position, color, glowColor, scale = 1, p
     if (halo2.current) halo2.current.rotation.z = -t * 0.22;
 
     const pulse = pulseRef ? pulseRef.current : 0;
-    if (core.current) {
-      core.current.material.emissiveIntensity = 0.6 + pulse * 1.2;
+
+    let visibilityScale = 1;
+    const currentT = scrollStore.t;
+
+    if (fadeStart !== undefined && fadeEnd !== undefined) {
+      if (currentT >= fadeEnd) {
+        visibilityScale = 0;
+      } else if (currentT > fadeStart) {
+        visibilityScale = 1 - (currentT - fadeStart) / (fadeEnd - fadeStart);
+      }
     }
+
     if (group.current) {
-      const s = scale + pulse * 0.25;
+      const s = (scale + pulse * 0.25) * visibilityScale;
       group.current.scale.setScalar(s);
+      group.current.visible = visibilityScale > 0.001;
+    }
+
+    if (labelRef.current) {
+      labelRef.current.style.opacity = String(visibilityScale);
+      labelRef.current.style.display = visibilityScale > 0.001 ? 'inline-flex' : 'none';
     }
   });
 
@@ -59,33 +84,38 @@ export default function CharacterNode({ position, color, glowColor, scale = 1, p
 
       {label && (
         <Html center position={[0, 1.45, 0]} distanceFactor={14}>
-          <div style={{
-            display: 'inline-flex',
-            alignItems: 'center',
-            gap: '5px',
-            fontFamily: "'JetBrains Mono', monospace",
-            fontSize: '10px',
-            fontWeight: 800,
-            letterSpacing: '0.12em',
-            textTransform: 'uppercase',
-            color: '#0F0F0F',
-            background: '#FAF9F5',
-            border: '1.5px solid #0F0F0F',
-            boxShadow: '2px 2px 0px #0F0F0F',
-            padding: '2px 8px',
-            borderRadius: '2px',
-            whiteSpace: 'nowrap',
-            pointerEvents: 'none',
-            userSelect: 'none',
-          }}>
-            <span style={{
-              width: '5px',
-              height: '5px',
-              borderRadius: '50%',
-              background: color,
-              border: '1px solid #0F0F0F',
-              display: 'inline-block',
-            }} />
+          <div
+            ref={labelRef}
+            style={{
+              display: 'inline-flex',
+              alignItems: 'center',
+              gap: '5px',
+              fontFamily: "'JetBrains Mono', monospace",
+              fontSize: '10px',
+              fontWeight: 800,
+              letterSpacing: '0.12em',
+              textTransform: 'uppercase',
+              color: '#0F0F0F',
+              background: '#FAF9F5',
+              border: '1.5px solid #0F0F0F',
+              boxShadow: '2px 2px 0px #0F0F0F',
+              padding: '2px 8px',
+              borderRadius: '2px',
+              whiteSpace: 'nowrap',
+              pointerEvents: 'none',
+              userSelect: 'none',
+            }}
+          >
+            <span
+              style={{
+                width: '5px',
+                height: '5px',
+                borderRadius: '50%',
+                background: color,
+                border: '1px solid #0F0F0F',
+                display: 'inline-block',
+              }}
+            />
             {label}
           </div>
         </Html>

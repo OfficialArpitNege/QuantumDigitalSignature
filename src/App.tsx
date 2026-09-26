@@ -1,6 +1,7 @@
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import ScrollToTop from './components/ScrollToTop';
 import LandingPage from './landing/LandingPage';
+import TransitionPage from './pages/TransitionPage';
 import SimulatorLayout from './pages/simulator/SimulatorLayout';
 import ExperimentPage from './pages/simulator/ExperimentPage';
 import AnalysisPage from './pages/simulator/AnalysisPage';
@@ -14,6 +15,7 @@ export default function App() {
       <ScrollToTop />
       <Routes>
         <Route path="/" element={<LandingPage />} />
+        <Route path="/transition" element={<TransitionPage />} />
         <Route path="/simulator" element={<SimulatorLayout />}>
           <Route index element={<ExperimentPage />} />
           <Route path="network" element={<DistributedNetworkPage />} />

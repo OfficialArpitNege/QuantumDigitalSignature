@@ -1,0 +1,527 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>AetherQ | Transition Page</title>
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <script>
+      tailwind.config = {
+        theme: {
+          extend: {
+            fontFamily: {
+              sans: ['Inter', 'system-ui', '-apple-system', 'BlinkMacSystemFont', 'Segoe UI', 'Roboto', 'sans-serif'],
+              mono: ['JetBrains Mono', 'Fira Code', 'SFMono-Regular', 'Menlo', 'monospace'],
+            },
+            colors: {
+              qblue: { 50: '#f0f7ff', 100: '#e0effe', 500: '#0284c7', 600: '#0369a1' },
+              qcyan: '#06b6d4',
+              qviolet: '#8b5cf6',
+            },
+          },
+        },
+      };
+    </script>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet" />
+    <style>
+      @keyframes subtleFloat {
+        0%, 100% { transform: translateY(0px); }
+        50% { transform: translateY(-6px); }
+      }
+      @keyframes pulseGlow {
+        0%, 100% { opacity: 0.35; transform: scale(1); }
+        50% { opacity: 0.7; transform: scale(1.04); }
+      }
+      @keyframes gateAppear {
+        0% { transform: scale(0.6); opacity: 0; }
+        70% { transform: scale(1.12); opacity: 1; }
+        100% { transform: scale(1); opacity: 1; }
+      }
+      @keyframes popIn {
+        0% { transform: scale(0.4); opacity: 0; }
+        70% { transform: scale(1.18); opacity: 1; }
+        100% { transform: scale(1); opacity: 1; }
+      }
+
+      .animate-float { animation: subtleFloat 4s ease-in-out infinite; }
+      .gate-enter { animation: gateAppear 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
+      .text-pop { animation: popIn 0.3s cubic-bezier(0.34, 1.56, 0.64, 1) forwards; transform-origin: center; }
+      .qubit-state-tag { font-variant-numeric: tabular-nums; font-feature-settings: "tnum"; direction: ltr !important; unicode-bidi: isolate; transform: none !important; }
+      .bg-quantum-grid {
+        background-size: 32px 32px;
+        background-image: radial-gradient(circle, #cbd5e1 0.75px, transparent 0.75px);
+      }
+      .draw-path {
+        stroke-dashoffset: 1000;
+        stroke-dasharray: 1000;
+        transition: stroke-dashoffset 0.45s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.3s ease;
+      }
+      .draw-path.drawn { stroke-dashoffset: 0 !important; }
+      @keyframes heroDrawAxisZ {
+        0% { stroke-dashoffset: 80; opacity: 0; }
+        5%, 85% { stroke-dashoffset: 0; opacity: 1; }
+        92%, 100% { stroke-dashoffset: 80; opacity: 0; }
+      }
+      @keyframes heroDrawAxisY {
+        0%, 8% { stroke-dashoffset: 80; opacity: 0; }
+        15%, 85% { stroke-dashoffset: 0; opacity: 1; }
+        92%, 100% { stroke-dashoffset: 80; opacity: 0; }
+      }
+      @keyframes heroDrawSphere {
+        0%, 15% { stroke-dashoffset: 240; opacity: 0; }
+        30%, 85% { stroke-dashoffset: 0; opacity: 1; }
+        92%, 100% { stroke-dashoffset: 240; opacity: 0; }
+      }
+      @keyframes heroDrawEquator {
+        0%, 25% { stroke-dashoffset: 240; opacity: 0; }
+        40%, 85% { stroke-dashoffset: 0; opacity: 1; }
+        92%, 100% { stroke-dashoffset: 240; opacity: 0; }
+      }
+      @keyframes heroDrawV0 { 0%, 38% { stroke-dashoffset: 50; opacity: 0; } 48%, 85% { stroke-dashoffset: 0; opacity: 1; } 92%, 100% { stroke-dashoffset: 50; opacity: 0; } }
+      @keyframes heroDrawV1 { 0%, 48% { stroke-dashoffset: 50; opacity: 0; } 58%, 85% { stroke-dashoffset: 0; opacity: 1; } 92%, 100% { stroke-dashoffset: 50; opacity: 0; } }
+      @keyframes heroDrawVpsi { 0%, 58% { stroke-dashoffset: 50; opacity: 0; } 68%, 85% { stroke-dashoffset: 0; opacity: 1; } 92%, 100% { stroke-dashoffset: 50; opacity: 0; } }
+      @keyframes heroDotPulse { 0%, 3% { transform: scale(0); opacity: 0; } 8%, 85% { transform: scale(1); opacity: 1; } 92%, 100% { transform: scale(0); opacity: 0; } }
+      .h-anim-z { stroke-dasharray: 80; animation: heroDrawAxisZ 4s cubic-bezier(0.4, 0, 0.2, 1) infinite; }
+      .h-anim-y { stroke-dasharray: 80; animation: heroDrawAxisY 4s cubic-bezier(0.4, 0, 0.2, 1) infinite; }
+      .h-anim-sphere { stroke-dasharray: 240; animation: heroDrawSphere 4s cubic-bezier(0.4, 0, 0.2, 1) infinite; }
+      .h-anim-equator { stroke-dasharray: 240; animation: heroDrawEquator 4s cubic-bezier(0.4, 0, 0.2, 1) infinite; }
+      .h-anim-v0 { stroke-dasharray: 50; animation: heroDrawV0 4s cubic-bezier(0.4, 0, 0.2, 1) infinite; }
+      .h-anim-v1 { stroke-dasharray: 50; animation: heroDrawV1 4s cubic-bezier(0.4, 0, 0.2, 1) infinite; }
+      .h-anim-vpsi { stroke-dasharray: 50; animation: heroDrawVpsi 4s cubic-bezier(0.4, 0, 0.2, 1) infinite; }
+      .h-anim-dot { transform-origin: 50px 50px; animation: heroDotPulse 4s ease-out infinite; }
+    </style>
+  </head>
+  <body class="bg-[#fafbfc] text-slate-800 antialiased min-h-screen font-sans selection:bg-cyan-100 selection:text-cyan-900 relative overflow-hidden">
+    <div class="fixed inset-0 bg-[#fafbfc] z-50 flex flex-col items-center justify-center p-6 transition-all duration-700 bg-quantum-grid" id="quantumBootSequence">
+      <div class="absolute top-8 px-4 py-1.5 rounded-full bg-white border border-slate-200/80 shadow-sm flex items-center text-xs font-mono text-slate-600 animate-fadeIn">
+      </div>
+
+      <div class="w-full max-w-4xl flex flex-col items-center justify-center transition-transform duration-700 ease-out" id="stageContainer">
+        <div class="relative w-80 h-84 md:w-96 md:h-96 flex items-center justify-center my-1">
+          <div class="absolute w-64 h-64 rounded-full bg-gradient-to-tr from-cyan-100/50 via-blue-100/40 to-emerald-100/40 blur-2xl transition-all duration-1000 opacity-60" id="sphereGlow"></div>
+          <svg class="w-full h-full relative z-10 transition-transform duration-700" fill="none" id="blochSvg" viewBox="0 0 400 440">
+            <defs>
+              <marker id="arrow-axis" markerHeight="6" markerWidth="6" orient="auto-start-reverse" refX="7" refY="5" viewBox="0 0 10 10">
+                <path d="M 0 1.5 L 8 5 L 0 8.5 z" fill="#0f172a"></path>
+              </marker>
+              <marker id="arrow-blue" markerHeight="6.5" markerWidth="6.5" orient="auto-start-reverse" refX="7" refY="5" viewBox="0 0 10 10">
+                <path d="M 0 1.5 L 8 5 L 0 8.5 z" fill="#0033cc"></path>
+              </marker>
+              <marker id="arrow-red" markerHeight="6.5" markerWidth="6.5" orient="auto-start-reverse" refX="7" refY="5" viewBox="0 0 10 10">
+                <path d="M 0 1.5 L 8 5 L 0 8.5 z" fill="#cc0000"></path>
+              </marker>
+              <marker id="arrow-green" markerHeight="6.5" markerWidth="6.5" orient="auto-start-reverse" refX="7" refY="5" viewBox="0 0 10 10">
+                <path d="M 0 1.5 L 8 5 L 0 8.5 z" fill="#16a34a"></path>
+              </marker>
+              <marker id="arrow-arc" markerHeight="4.5" markerWidth="4.5" orient="auto" refX="6" refY="4" viewBox="0 0 8 8">
+                <path d="M 1 1.5 L 6 4 L 1 6.5 z" fill="#0f172a"></path>
+              </marker>
+            </defs>
+            <g id="b-stage-axes">
+              <circle class="opacity-0 transition-opacity duration-200" cx="170" cy="235" fill="#0f172a" id="b-origin-dot" r="3.5"></circle>
+              <path class="draw-path" d="M 170 235 L 170 35" id="b-axis-z" marker-end="url(#arrow-axis)" stroke="#000000" stroke-linecap="round" stroke-width="1.6"></path>
+              <text class="opacity-0 font-semibold" fill="#000000" font-family="'Inter', serif, system-ui" font-size="24" font-style="italic" id="b-lbl-z" text-anchor="middle" x="170" y="24">z</text>
+              <path class="draw-path" d="M 170 235 L 385 235" id="b-axis-y" marker-end="url(#arrow-axis)" stroke="#000000" stroke-linecap="round" stroke-width="1.6"></path>
+              <path class="draw-path" d="M 170 235 L 20 235" id="b-axis-y-neg" stroke="#000000" stroke-linecap="round" stroke-width="1.3"></path>
+              <text class="opacity-0 font-semibold" fill="#000000" font-family="'Inter', serif, system-ui" font-size="24" font-style="italic" id="b-lbl-y" x="366" y="268">y</text>
+              <path class="draw-path" d="M 170 235 L 20 385" id="b-axis-x" marker-end="url(#arrow-axis)" stroke="#000000" stroke-linecap="round" stroke-width="1.6"></path>
+              <text class="opacity-0 font-semibold" fill="#000000" font-family="'Inter', serif, system-ui" font-size="24" font-style="italic" id="b-lbl-x" x="44" y="392">x</text>
+            </g>
+            <g id="b-stage-geometry">
+              <path class="draw-path" d="M 170 85 A 150 150 0 1 1 169.9 85 Z" fill="#ffffff" fill-opacity="0.85" id="b-sphere-circle" stroke="#000000" stroke-width="1.8"></path>
+              <path class="draw-path" d="M 20 235 A 150 60 0 1 0 320 235 A 150 60 0 1 0 20 235 Z" fill="none" id="b-equator-ellipse" stroke="#000000" stroke-width="1.5"></path>
+              <path class="draw-path opacity-40" d="M 170 85 A 60 150 0 0 1 170 385 A 60 150 0 0 1 170 85" fill="none" id="b-meridian-ellipse" stroke="#64748b" stroke-dasharray="3 3" stroke-width="1"></path>
+            </g>
+            <g id="b-stage-basis">
+              <path class="draw-path" d="M 170 235 L 170 90" id="b-vec-0" marker-end="url(#arrow-blue)" stroke="#0033cc" stroke-linecap="round" stroke-width="3.5"></path>
+              <text class="qubit-state-tag opacity-0" fill="#0033cc" font-family="'Inter', sans-serif" font-size="24" font-weight="600" id="b-lbl-0" x="178" y="78">|0⟩</text>
+              <path class="draw-path" d="M 170 235 L 170 380" id="b-vec-1" marker-end="url(#arrow-red)" stroke="#cc0000" stroke-linecap="round" stroke-width="3.5"></path>
+              <text class="qubit-state-tag opacity-0" fill="#cc0000" font-family="'Inter', sans-serif" font-size="24" font-weight="600" id="b-lbl-1" text-anchor="middle" x="170" y="415">|1⟩</text>
+            </g>
+            <g id="b-stage-angles">
+              <path class="draw-path opacity-80" d="M 170 85 A 150 150 0 0 1 290 270" fill="none" id="b-proj-arc" stroke="#000000" stroke-dasharray="2 3" stroke-width="1.3"></path>
+              <path class="draw-path" d="M 170 235 L 286 269" fill="none" id="b-proj-line" stroke="#000000" stroke-dasharray="2 3" stroke-width="1.3"></path>
+              <path class="draw-path" d="M 136 269 A 60 24 0 0 0 234 254" fill="none" id="b-arc-phi" marker-end="url(#arrow-arc)" stroke="#000000" stroke-width="1.4"></path>
+              <text class="opacity-0 font-medium" fill="#000000" font-family="'Inter', serif, system-ui" font-size="20" font-style="italic" id="b-lbl-phi" x="180" y="280">φ</text>
+              <path class="draw-path" d="M 170 120 A 115 115 0 0 1 234 171" fill="none" id="b-arc-theta" marker-end="url(#arrow-arc)" stroke="#000000" stroke-width="1.4"></path>
+              <text class="opacity-0 font-medium" fill="#000000" font-family="'Inter', serif, system-ui" font-size="20" font-style="italic" id="b-lbl-theta" x="216" y="132">θ</text>
+            </g>
+            <g id="b-stage-psi">
+              <path class="draw-path" d="M 170 235 L 260 145" id="b-vec-psi" marker-end="url(#arrow-green)" stroke="#16a34a" stroke-linecap="round" stroke-width="3.5"></path>
+              <text class="qubit-state-tag opacity-0" fill="#16a34a" font-family="'Inter', sans-serif" font-size="24" font-weight="600" id="b-lbl-psi" x="286" y="132">|ψ⟩</text>
+            </g>
+          </svg>
+          <div class="absolute inset-0 pointer-events-none z-20" id="floatingQubitsLayer"></div>
+        </div>
+
+        <div class="w-full max-w-2xl bg-white/90 border border-slate-200/90 rounded-2xl p-5 shadow-sm mt-3 transition-all duration-700 opacity-90 backdrop-blur-sm" id="circuitSection">
+          <div class="flex items-center justify-between pb-3 mb-2 border-b border-slate-100">
+            <div class="flex items-center space-x-2">
+              <span class="w-2 h-2 rounded-full bg-cyan-500"></span>
+              <span class="text-xs font-semibold text-slate-700 uppercase tracking-wider font-mono">Real-Time Circuit Synthesis</span>
+            </div>
+            <span class="text-xs font-mono text-slate-400" id="circuitClock">τ = 0.00 ns</span>
+          </div>
+          <div class="relative w-full overflow-x-auto py-1">
+            <svg class="w-full h-32" fill="none" id="circuitSvg" viewBox="0 0 620 120">
+              <g class="qubit-wire">
+                <text class="qubit-state-tag" fill="#0033cc" font-family="'JetBrains Mono', monospace" font-size="12" font-weight="600" x="25" y="44">|0⟩</text>
+                <path d="M 50 40 L 580 40" id="wireLine0" stroke="#e2e8f0" stroke-linecap="round" stroke-width="1.75"></path>
+                <path class="transition-all duration-1000 ease-out" d="M 50 40 L 580 40" id="wireLine0Active" stroke="#0033cc" stroke-dasharray="530" stroke-dashoffset="530" stroke-linecap="round" stroke-width="1.75"></path>
+              </g>
+              <g class="qubit-wire">
+                <text class="qubit-state-tag" fill="#0033cc" font-family="'JetBrains Mono', monospace" font-size="12" font-weight="600" x="25" y="94">|0⟩</text>
+                <path d="M 50 90 L 580 90" id="wireLine1" stroke="#e2e8f0" stroke-linecap="round" stroke-width="1.75"></path>
+                <path class="transition-all duration-1000 ease-out" d="M 50 90 L 580 90" id="wireLine1Active" stroke="#cc0000" stroke-dasharray="530" stroke-dashoffset="530" stroke-linecap="round" stroke-width="1.75"></path>
+              </g>
+              <g id="gatesGroup">
+                <g class="opacity-0 transition-opacity duration-300" id="gateH">
+                  <rect class="shadow-sm" fill="#ffffff" height="32" rx="6" stroke="#0033cc" stroke-width="1.5" width="32" x="125" y="24"></rect>
+                  <text fill="#0033cc" font-family="'JetBrains Mono', monospace" font-size="12" font-weight="700" text-anchor="middle" x="141" y="44">H</text>
+                </g>
+                <g class="opacity-0 transition-opacity duration-300" id="gateCNOT">
+                  <line stroke="#0033cc" stroke-width="1.5" x1="260" x2="260" y1="40" y2="90"></line>
+                  <circle cx="260" cy="40" fill="#0033cc" r="5"></circle>
+                  <circle cx="260" cy="90" fill="#ffffff" r="10" stroke="#16a34a" stroke-width="1.5"></circle>
+                  <line stroke="#16a34a" stroke-width="1.5" x1="253" x2="267" y1="90" y2="90"></line>
+                  <line stroke="#16a34a" stroke-width="1.5" x1="260" x2="260" y1="83" y2="97"></line>
+                </g>
+                <g class="opacity-0 transition-opacity duration-300" id="gateX">
+                  <rect class="shadow-sm" fill="#ffffff" height="32" rx="6" stroke="#cc0000" stroke-width="1.5" width="32" x="345" y="74"></rect>
+                  <text fill="#cc0000" font-family="'JetBrains Mono', monospace" font-size="12" font-weight="700" text-anchor="middle" x="361" y="94">X</text>
+                </g>
+                <g class="opacity-0 transition-opacity duration-300" id="gateZ">
+                  <rect class="shadow-sm" fill="#ffffff" height="32" rx="6" stroke="#06b6d4" stroke-width="1.5" width="32" x="425" y="24"></rect>
+                  <text fill="#06b6d4" font-family="'JetBrains Mono', monospace" font-size="12" font-weight="700" text-anchor="middle" x="441" y="44">Z</text>
+                </g>
+                <g class="opacity-0 transition-opacity duration-300" id="gateM">
+                  <rect fill="#f8fafc" height="32" rx="6" stroke="#475569" stroke-width="1.5" width="32" x="505" y="24"></rect>
+                  <path d="M 513 46 A 8 8 0 0 1 529 46" fill="none" stroke="#475569" stroke-width="1.25"></path>
+                  <line stroke="#475569" stroke-linecap="round" stroke-width="1.25" x1="521" x2="528" y1="46" y2="36"></line>
+                  <rect fill="#f8fafc" height="32" rx="6" stroke="#475569" stroke-width="1.5" width="32" x="505" y="74"></rect>
+                  <path d="M 513 96 A 8 8 0 0 1 529 96" fill="none" stroke="#475569" stroke-width="1.25"></path>
+                  <line stroke="#475569" stroke-linecap="round" stroke-width="1.25" x1="521" x2="528" y1="96" y2="86"></line>
+                </g>
+              </g>
+            </svg>
+          </div>
+        </div>
+
+        <div class="w-full max-w-md mt-6 flex flex-col items-center">
+          <div class="h-8 flex items-center justify-center">
+            <span class="text-base font-medium text-slate-800 tracking-tight transition-all duration-300 flex items-center gap-2" id="activeStatusLabel">
+              <svg class="w-4 h-4 text-cyan-600 animate-spin" fill="none" viewBox="0 0 24 24">
+                <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="3"></circle>
+                <path class="opacity-75" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" fill="currentColor"></path>
+              </svg>
+              Initializing quantum environment...
+            </span>
+          </div>
+          <div class="text-xs font-mono text-slate-500 mt-1" id="subStatusLabel">
+            Preparing quantum states (<span class="text-blue-600">|0⟩</span>, <span class="text-red-600">|1⟩</span> → <span class="text-green-600">|ψ⟩</span>)
+          </div>
+          <div class="flex items-center gap-2.5 mt-5">
+            <div class="flex items-center justify-center w-6 h-6 rounded-full bg-cyan-100 text-cyan-700 text-xs font-medium transition-all duration-300" id="stepDot0"><span class="step-num">1</span></div>
+            <div class="w-5 h-[1.5px] bg-slate-200" id="stepLine0"></div>
+            <div class="flex items-center justify-center w-6 h-6 rounded-full bg-slate-100 text-slate-400 text-xs font-medium transition-all duration-300" id="stepDot1"><span class="step-num">2</span></div>
+            <div class="w-5 h-[1.5px] bg-slate-200" id="stepLine1"></div>
+            <div class="flex items-center justify-center w-6 h-6 rounded-full bg-slate-100 text-slate-400 text-xs font-medium transition-all duration-300" id="stepDot2"><span class="step-num">3</span></div>
+            <div class="w-5 h-[1.5px] bg-slate-200" id="stepLine2"></div>
+            <div class="flex items-center justify-center w-6 h-6 rounded-full bg-slate-100 text-slate-400 text-xs font-medium transition-all duration-300" id="stepDot3"><span class="step-num">4</span></div>
+            <div class="w-5 h-[1.5px] bg-slate-200" id="stepLine3"></div>
+            <div class="flex items-center justify-center w-6 h-6 rounded-full bg-slate-100 text-slate-400 text-xs font-medium transition-all duration-300" id="stepDot4"><span class="step-num">5</span></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <script>
+      const checkmarkSvg = `<svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="3"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/></svg>`;
+      let bootAnimationTimers = [];
+
+      function markStepCompleted(stepIdx) {
+        const dot = document.getElementById(`stepDot${stepIdx}`);
+        const line = document.getElementById(`stepLine${stepIdx}`);
+        if (dot) {
+          dot.className = 'flex items-center justify-center w-6 h-6 rounded-full bg-emerald-100 text-emerald-700 text-xs font-medium transition-all duration-300 scale-105 shadow-sm';
+          dot.innerHTML = checkmarkSvg;
+        }
+        if (line) {
+          line.className = 'w-5 h-[1.5px] bg-emerald-400 transition-colors duration-300';
+        }
+        const nextDot = document.getElementById(`stepDot${stepIdx + 1}`);
+        if (nextDot && stepIdx + 1 <= 4) {
+          nextDot.className = 'flex items-center justify-center w-6 h-6 rounded-full bg-cyan-100 text-cyan-700 text-xs font-medium ring-2 ring-cyan-400 ring-offset-2 transition-all duration-300';
+        }
+      }
+
+      function createFloatingQubit(symbolText, colorClass, startX, startY, destX, destY, delayMs) {
+        const t = setTimeout(() => {
+          const layer = document.getElementById('floatingQubitsLayer');
+          if (!layer) return;
+          const el = document.createElement('div');
+          el.className = `absolute px-2.5 py-1 rounded-md bg-white border border-slate-300/80 shadow-md text-xs font-mono font-bold ${colorClass} qubit-state-tag select-none pointer-events-none transition-all duration-1000 ease-in-out`;
+          el.style.left = startX + 'px';
+          el.style.top = startY + 'px';
+          el.style.opacity = '0';
+          el.style.transform = 'translate(-50%, -50%) scale(0.7)';
+          el.textContent = symbolText;
+          layer.appendChild(el);
+
+          requestAnimationFrame(() => {
+            el.style.opacity = '1';
+            el.style.transform = 'translate(-50%, -50%) scale(1)';
+            setTimeout(() => {
+              el.style.left = destX + 'px';
+              el.style.top = destY + 'px';
+              el.style.opacity = '0.15';
+              setTimeout(() => el.remove(), 1000);
+            }, 350);
+          });
+        }, delayMs);
+        bootAnimationTimers.push(t);
+      }
+
+      function drawLinePath(id, durationMs = 380) {
+        const el = document.getElementById(id);
+        if (!el) return;
+        const len = el.getTotalLength ? el.getTotalLength() : 600;
+        el.style.strokeDasharray = len;
+        el.style.strokeDashoffset = len;
+        el.style.transition = `stroke-dashoffset ${durationMs}ms cubic-bezier(0.33, 1, 0.68, 1), opacity 200ms ease`;
+        el.style.opacity = '1';
+        requestAnimationFrame(() => {
+          requestAnimationFrame(() => {
+            el.style.strokeDashoffset = '0';
+          });
+        });
+      }
+
+      function popInLabel(id) {
+        const el = document.getElementById(id);
+        if (!el) return;
+        el.classList.remove('opacity-0');
+        el.classList.add('text-pop');
+      }
+
+      function resetBlochConstruction() {
+        bootAnimationTimers.forEach(clearTimeout);
+        bootAnimationTimers = [];
+
+        const dot = document.getElementById('b-origin-dot');
+        if (dot) dot.classList.add('opacity-0');
+
+        const paths = ['b-axis-z', 'b-axis-y', 'b-axis-y-neg', 'b-axis-x', 'b-sphere-circle', 'b-equator-ellipse', 'b-meridian-ellipse', 'b-vec-0', 'b-vec-1', 'b-proj-arc', 'b-proj-line', 'b-arc-phi', 'b-arc-theta', 'b-vec-psi'];
+        paths.forEach((id) => {
+          const el = document.getElementById(id);
+          if (el) {
+            const len = el.getTotalLength ? el.getTotalLength() : 800;
+            el.style.transition = 'none';
+            el.style.strokeDasharray = len;
+            el.style.strokeDashoffset = len;
+          }
+        });
+
+        const labels = ['b-lbl-z', 'b-lbl-y', 'b-lbl-x', 'b-lbl-0', 'b-lbl-1', 'b-lbl-phi', 'b-lbl-theta', 'b-lbl-psi'];
+        labels.forEach((id) => {
+          const el = document.getElementById(id);
+          if (el) {
+            el.classList.add('opacity-0');
+            el.classList.remove('text-pop');
+          }
+        });
+      }
+
+      function playBlochDrawingSequence() {
+        resetBlochConstruction();
+        const schedule = (fn, delay) => {
+          const timer = setTimeout(fn, delay);
+          bootAnimationTimers.push(timer);
+        };
+
+        schedule(() => {
+          const dot = document.getElementById('b-origin-dot');
+          if (dot) dot.classList.remove('opacity-0');
+        }, 50);
+
+        schedule(() => {
+          drawLinePath('b-axis-z', 300);
+          schedule(() => popInLabel('b-lbl-z'), 160);
+        }, 100);
+
+        schedule(() => {
+          drawLinePath('b-axis-y', 300);
+          drawLinePath('b-axis-y-neg', 240);
+          schedule(() => popInLabel('b-lbl-y'), 160);
+        }, 240);
+
+        schedule(() => {
+          drawLinePath('b-axis-x', 300);
+          schedule(() => popInLabel('b-lbl-x'), 160);
+        }, 380);
+
+        schedule(() => {
+          drawLinePath('b-sphere-circle', 450);
+        }, 520);
+
+        schedule(() => {
+          drawLinePath('b-equator-ellipse', 380);
+          drawLinePath('b-meridian-ellipse', 320);
+        }, 720);
+
+        schedule(() => {
+          drawLinePath('b-vec-0', 280);
+          schedule(() => popInLabel('b-lbl-0'), 150);
+        }, 920);
+
+        schedule(() => {
+          drawLinePath('b-vec-1', 280);
+          schedule(() => popInLabel('b-lbl-1'), 150);
+        }, 1120);
+
+        schedule(() => {
+          drawLinePath('b-proj-arc', 300);
+          drawLinePath('b-proj-line', 240);
+        }, 1280);
+
+        schedule(() => {
+          drawLinePath('b-arc-phi', 240);
+          schedule(() => popInLabel('b-lbl-phi'), 120);
+        }, 1420);
+
+        schedule(() => {
+          drawLinePath('b-arc-theta', 240);
+          schedule(() => popInLabel('b-lbl-theta'), 120);
+        }, 1560);
+
+        schedule(() => {
+          drawLinePath('b-vec-psi', 320);
+          schedule(() => popInLabel('b-lbl-psi'), 160);
+        }, 1700);
+      }
+
+      function replayBootAnimation() { playBlochDrawingSequence(); }
+
+      function startQuantumBootSequence() {
+        const activeStatus = document.getElementById('activeStatusLabel');
+        const subStatus = document.getElementById('subStatusLabel');
+        const wire0Active = document.getElementById('wireLine0Active');
+        const wire1Active = document.getElementById('wireLine1Active');
+
+        playBlochDrawingSequence();
+
+        setTimeout(() => {
+          activeStatus.innerHTML = `
+            <svg class="w-4 h-4 text-cyan-600 animate-spin" fill="none" viewBox="0 0 24 24">
+              <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="3"></circle>
+              <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+            </svg>
+            Initializing quantum environment...
+          `;
+          subStatus.innerHTML = 'Tracing coordinate geometry: <span class="font-mono text-slate-800">x, y, z</span> axes & spherical boundary';
+          markStepCompleted(0);
+        }, 400);
+
+        setTimeout(() => {
+          activeStatus.innerHTML = `
+            <svg class="w-4 h-4 text-blue-600 animate-spin" fill="none" viewBox="0 0 24 24">
+              <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="3"></circle>
+              <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+            </svg>
+            Allocating qubits &amp; basis vectors...
+          `;
+          subStatus.innerHTML = `Erecting state vectors: <span class="qubit-state-tag font-semibold text-blue-600">|0⟩</span> (North) &rarr; <span class="qubit-state-tag font-semibold text-red-600">|1⟩</span> (South) &rarr; <span class="qubit-state-tag font-semibold text-green-600">|ψ⟩</span>`;
+          markStepCompleted(1);
+          createFloatingQubit('|0⟩', 'text-blue-600', 80, 100, 160, 270, 0);
+          createFloatingQubit('|0⟩', 'text-blue-600', 250, 120, 200, 280, 150);
+          createFloatingQubit('|1⟩', 'text-red-600', 100, 260, 170, 310, 300);
+          createFloatingQubit('|ψ⟩', 'text-green-600', 260, 80, 220, 280, 450);
+        }, 1050);
+
+        setTimeout(() => {
+          activeStatus.innerHTML = `
+            <svg class="w-4 h-4 text-violet-600 animate-spin" fill="none" viewBox="0 0 24 24">
+              <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="3"></circle>
+              <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+            </svg>
+            Compiling quantum circuit...
+          `;
+          subStatus.textContent = 'Mapping unitary gates: H, CNOT, X, Z, M';
+          markStepCompleted(2);
+          wire0Active.style.strokeDashoffset = '0';
+          wire1Active.style.strokeDashoffset = '0';
+
+          setTimeout(() => {
+            document.getElementById('gateH').classList.remove('opacity-0');
+            document.getElementById('gateH').classList.add('gate-enter');
+            document.getElementById('circuitClock').textContent = 'τ = 12.4 ns';
+          }, 150);
+
+          setTimeout(() => {
+            document.getElementById('gateCNOT').classList.remove('opacity-0');
+            document.getElementById('gateCNOT').classList.add('gate-enter');
+            document.getElementById('circuitClock').textContent = 'τ = 28.6 ns';
+          }, 300);
+
+          setTimeout(() => {
+            document.getElementById('gateX').classList.remove('opacity-0');
+            document.getElementById('gateX').classList.add('gate-enter');
+          }, 450);
+
+          setTimeout(() => {
+            document.getElementById('gateZ').classList.remove('opacity-0');
+            document.getElementById('gateZ').classList.add('gate-enter');
+          }, 600);
+
+          setTimeout(() => {
+            document.getElementById('gateM').classList.remove('opacity-0');
+            document.getElementById('gateM').classList.add('gate-enter');
+            document.getElementById('circuitClock').textContent = 'τ = 45.0 ns';
+          }, 750);
+        }, 1650);
+
+        setTimeout(() => {
+          activeStatus.innerHTML = `
+            <svg class="w-4 h-4 text-emerald-600 animate-spin" fill="none" viewBox="0 0 24 24">
+              <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="3"></circle>
+              <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+            </svg>
+            Initializing simulation engine...
+          `;
+          subStatus.textContent = 'Computing Kronecker tensor products & state vectors';
+          markStepCompleted(3);
+        }, 2250);
+
+        setTimeout(() => {
+          activeStatus.innerHTML = `
+            <span class="inline-flex items-center justify-center w-5 h-5 rounded-full bg-emerald-100 text-emerald-600 mr-1.5">${checkmarkSvg}</span>
+            <span class="text-emerald-700 font-semibold">Quantum simulator ready ✓</span>
+          `;
+          subStatus.textContent = 'Cryogenic coherence stabilized (Fidelity: 99.98%)';
+          markStepCompleted(4);
+          const blochSvg = document.getElementById('blochSvg');
+          const circuitSection = document.getElementById('circuitSection');
+          const stageContainer = document.getElementById('stageContainer');
+          const sphereGlow = document.getElementById('sphereGlow');
+          blochSvg.style.transform = 'scale(0.92)';
+          circuitSection.style.boxShadow = '0 0 25px rgba(6, 182, 212, 0.45)';
+          circuitSection.style.borderColor = '#06b6d4';
+          sphereGlow.style.opacity = '0.9';
+          sphereGlow.style.transform = 'scale(1.2)';
+          setTimeout(() => {
+            stageContainer.style.transform = 'scale(1.1)';
+            stageContainer.style.opacity = '0';
+            document.getElementById('quantumBootSequence').style.opacity = '0';
+            setTimeout(() => {
+              window.location.href = 'final-page.html';
+            }, 450);
+          }, 550);
+        }, 2750);
+      }
+
+      document.addEventListener('DOMContentLoaded', startQuantumBootSequence);
+    </script>
+  </body>
+</html>

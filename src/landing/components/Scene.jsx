@@ -35,7 +35,14 @@ export default function Scene() {
         <RejectBurst />
 
         <CharacterNode position={ALICE_POS} label="SENDER" color="#1fb6d6" glowColor="#5fe0f4" />
-        <CharacterNode position={BOB_POS} label="RECEIVER" color="#7c6cf6" glowColor="#a89bff" />
+        <CharacterNode
+          position={BOB_POS}
+          label="RECEIVER"
+          color="#7c6cf6"
+          glowColor="#a89bff"
+          fadeStart={0.84}
+          fadeEnd={0.92}
+        />
         <CharacterNode
           position={EVE_POS}
           label="ATTACKER"

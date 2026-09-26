@@ -2,7 +2,7 @@ import { useEffect, useRef, useState } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { subscribe } from '../scrollStore.js';
 
-export default function Nav() {
+export default function Nav({ onLaunchSimulator }) {
   const fillRef = useRef();
   const navigate = useNavigate();
   const location = useLocation();
@@ -98,8 +98,12 @@ export default function Nav() {
 
             <button
               onClick={() => {
-                window.scrollTo({ top: 0, left: 0, behavior: 'instant' });
-                navigate('/simulator');
+                if (onLaunchSimulator) {
+                  onLaunchSimulator();
+                } else {
+                  window.scrollTo({ top: 0, left: 0, behavior: 'instant' });
+                  navigate('/transition');
+                }
               }}
               style={{
                 padding: '6px 14px',
@@ -123,8 +127,8 @@ export default function Nav() {
         </div>
       </nav>
 
-      {/* Floating Bottom-Right Progress Indicator (Appears ONLY when user scrolls down) */}
-      {progressVal > 0.02 && (
+      {/* Floating Bottom-Right Progress Indicator (Appears ONLY when user scrolls down and not transitioning) */}
+      {progressVal > 0.02 && !isSimulatorActive && (
         <div style={{
           position: 'fixed',
           bottom: 24,
