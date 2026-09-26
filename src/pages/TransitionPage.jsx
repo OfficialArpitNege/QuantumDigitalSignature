@@ -698,8 +698,8 @@ export default function TransitionPage({ isModal = false, onComplete = undefined
             <div className="absolute inset-0 pointer-events-none z-20" id="floatingQubitsLayer" />
           </div>
           <div
-            className="mt-2 text-3xl md:text-4xl font-black tracking-widest text-center animate-pulse select-none z-30 drop-shadow-[0_2px_10px_rgba(0,0,0,0.9)]"
-            style={{ color: '#ffffff', fontWeight: 900 }}
+            className="mt-4 text-4xl sm:text-5xl md:text-6xl font-black tracking-[0.15em] text-center animate-pulse select-none z-30 drop-shadow-[0_4px_20px_rgba(0,0,0,0.9)]"
+            style={{ color: '#ffffff', fontWeight: 900, transform: 'translateX(-7.5%)' }}
           >
             Loading...
           </div>
