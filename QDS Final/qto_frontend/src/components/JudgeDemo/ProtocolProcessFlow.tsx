@@ -23,49 +23,49 @@ const STAGES: StageConfig[] = [
     id: 'sign',
     label: 'SIGN',
     waitingDesc: 'HMAC-SHA256',
-    activeDesc: '🔐 Generating signature material...',
+    activeDesc: 'Generating signature material...',
     completeDesc: 'Signature Material Ready',
-    icon: '🔐',
+    icon: '',
   },
   {
     id: 'encode',
     label: 'ENCODE',
     waitingDesc: 'Qubit State Prep',
-    activeDesc: '⚛ Converting payload into quantum symbols...',
+    activeDesc: 'Converting payload into quantum symbols...',
     completeDesc: 'Quantum State Prepared',
-    icon: '⚛',
+    icon: '',
   },
   {
     id: 'transmit',
     label: 'TRANSMIT',
     waitingDesc: 'Quantum Teleportation',
-    activeDesc: '🌌 Transmitting quantum state through channel...',
+    activeDesc: 'Transmitting quantum state through channel...',
     completeDesc: 'Teleportation Complete',
-    icon: '🌌',
+    icon: '',
   },
   {
     id: 'analyze',
     label: 'ANALYZE',
     waitingDesc: 'Quantum Evidence',
-    activeDesc: '📊 Scanning quantum evidence & fidelity...',
+    activeDesc: 'Scanning quantum evidence & fidelity...',
     completeDesc: 'Evidence Analyzed',
-    icon: '📊',
+    icon: '',
   },
   {
     id: 'decide',
     label: 'DECIDE',
     waitingDesc: 'Verification Gates',
-    activeDesc: '🛡️ Evaluating deterministic verification gates...',
+    activeDesc: 'Evaluating deterministic verification gates...',
     completeDesc: 'Gates Evaluated',
-    icon: '🛡️',
+    icon: '',
   },
   {
     id: 'verify',
     label: 'VERIFY',
-    waitingDesc: 'Bob Confirmation',
-    activeDesc: '👨‍🔬 Bob verifying received state & consensus...',
+    waitingDesc: 'Receiver Confirmation',
+    activeDesc: 'Receiver verifying received state & consensus...',
     completeDesc: 'Protocol Consensus Reached',
-    icon: '👨‍🔬',
+    icon: '',
   },
 ];
 
@@ -99,13 +99,13 @@ export default function ProtocolProcessFlow({
           fontWeight: 800,
           textTransform: 'uppercase',
           letterSpacing: '0.12em',
-          color: '#cc0000',
+          color: '#0F0F0F',
           fontFamily: "'IBM Plex Mono', monospace",
           display: 'flex',
           alignItems: 'center',
           gap: 8,
         }}>
-          <span>⚛ QUANTUM PROTOCOL EXECUTION FLOW</span>
+          <span>QUANTUM PROTOCOL EXECUTION FLOW</span>
           {isRunning && (
             <span style={{
               fontSize: 9,
@@ -124,13 +124,13 @@ export default function ProtocolProcessFlow({
             <span style={{
               fontSize: 9,
               fontWeight: 800,
-              background: isAccept ? 'rgba(16,185,129,0.15)' : 'rgba(239,68,68,0.15)',
-              color: isAccept ? '#10b981' : '#ef4444',
+              background: isAccept ? '#D1FAE5' : '#FEE2E2',
+              color: isAccept ? '#065F46' : '#991B1B',
               padding: '2px 8px',
               borderRadius: 100,
-              border: `1px solid ${isAccept ? 'rgba(16,185,129,0.3)' : 'rgba(239,68,68,0.3)'}`,
+              border: `1.5px solid ${isAccept ? '#065F46' : '#991B1B'}`,
             }}>
-              {isAccept ? '✓ PROTOCOL COMPLETE — ACCEPTED' : '❌ PROTOCOL COMPLETE — REJECTED'}
+              {isAccept ? 'PROTOCOL COMPLETE — ACCEPTED' : 'PROTOCOL COMPLETE — REJECTED'}
             </span>
           )}
         </div>
@@ -161,12 +161,13 @@ export default function ProtocolProcessFlow({
         gap: 8,
       }}>
         {STAGES.map((stage, idx) => {
-          const isComplete = isDone || stepIndex > idx;
+          // A stage is only complete when execution reaches past it OR when the entire simulation is finished
+          const isStageFinished = isDone || (isRunning && stepIndex > idx);
           const isActive = isRunning && stepIndex === idx;
-          const isWaiting = !isDone && stepIndex < idx;
+          const isWaiting = !isDone && !isStageFinished && !isActive;
 
-          // Fail indicator logic if stage DECIDE or VERIFY failed
-          const isFailedStage = isDone && !isAccept && (idx === 4 || idx === 5);
+          // Fail indicator logic: ONLY evaluated once the protocol has reached/finished decision & verification (or full completion)
+          const isFailedStage = !isAccept && isStageFinished && (idx === 4 || idx === 5);
 
           return (
             <div
@@ -193,32 +194,32 @@ export default function ProtocolProcessFlow({
                 fontSize: 14,
                 fontWeight: 900,
                 transition: 'all 0.4s ease',
-                background: isComplete
-                  ? (isFailedStage ? 'rgba(239, 68, 68, 0.15)' : 'rgba(16, 185, 129, 0.15)')
+                background: isStageFinished
+                  ? (isFailedStage ? '#FCA5A5' : '#FAF9F5')
                   : isActive
-                  ? 'rgba(31, 182, 214, 0.2)'
-                  : 'var(--lab-surface-2)',
+                  ? '#FEF08A'
+                  : '#FAF9F5',
                 border: `2px solid ${
-                  isComplete
-                    ? (isFailedStage ? '#ef4444' : '#10b981')
+                  isStageFinished
+                    ? (isFailedStage ? '#DC2626' : '#1D4ED8')
                     : isActive
-                    ? '#1fb6d6'
-                    : 'var(--lab-border)'
+                    ? '#0F0F0F'
+                    : '#0F0F0F'
                 }`,
-                color: isComplete
-                  ? (isFailedStage ? '#ef4444' : '#10b981')
+                color: isStageFinished
+                  ? (isFailedStage ? '#DC2626' : '#1D4ED8')
                   : isActive
-                  ? '#1fb6d6'
-                  : 'var(--lab-text-muted)',
+                  ? '#0F0F0F'
+                  : '#555555',
                 boxShadow: isActive
-                  ? '0 0 16px rgba(31, 182, 214, 0.5)'
-                  : isComplete
-                  ? `0 0 10px ${isFailedStage ? 'rgba(239,68,68,0.3)' : 'rgba(16,185,129,0.3)'}`
+                  ? '3px 3px 0px #0F0F0F'
+                  : isStageFinished
+                  ? `2px 2px 0px ${isFailedStage ? '#DC2626' : '#0F0F0F'}`
                   : 'none',
                 transform: isActive ? 'scale(1.12)' : 'scale(1)',
                 marginBottom: 8,
               }}>
-                {isComplete ? (
+                {isStageFinished ? (
                   isFailedStage ? '✗' : '✓'
                 ) : isActive ? (
                   <span style={{ animation: 'qds-spin 1.2s linear infinite', display: 'inline-block' }}>⚙</span>
@@ -233,14 +234,15 @@ export default function ProtocolProcessFlow({
                 fontWeight: 900,
                 letterSpacing: '0.06em',
                 textTransform: 'uppercase',
-                color: isComplete
-                  ? (isFailedStage ? '#ef4444' : '#10b981')
+                color: isStageFinished
+                  ? (isFailedStage ? '#DC2626' : '#1D4ED8')
                   : isActive
-                  ? 'var(--lab-text)'
-                  : 'var(--lab-text-muted)',
+                  ? '#0F0F0F'
+                  : '#555555',
                 transition: 'color 0.3s ease',
                 textAlign: 'center',
                 marginBottom: 2,
+                fontFamily: "'JetBrains Mono', monospace",
               }}>
                 {stage.label}
               </div>
@@ -248,15 +250,16 @@ export default function ProtocolProcessFlow({
               {/* Stage Status Description */}
               <div style={{
                 fontSize: 9.5,
-                color: isActive ? '#1fb6d6' : isComplete ? 'var(--lab-text-sub)' : 'var(--lab-text-muted)',
+                color: isActive ? '#0F0F0F' : isStageFinished ? '#333333' : '#666666',
                 textAlign: 'center',
                 lineHeight: 1.35,
                 maxWidth: 110,
                 fontWeight: isActive ? 700 : 500,
                 transition: 'color 0.3s ease',
                 minHeight: 26,
+                fontFamily: "'JetBrains Mono', monospace",
               }}>
-                {isActive ? stage.activeDesc : isComplete ? stage.completeDesc : stage.waitingDesc}
+                {isActive ? stage.activeDesc : isStageFinished ? stage.completeDesc : stage.waitingDesc}
               </div>
 
               {/* Special Micro-Detail Badges during execution */}
@@ -306,14 +309,13 @@ export default function ProtocolProcessFlow({
                   {/* Fill progress bar */}
                   <div style={{
                     height: '100%',
-                    background: isComplete
-                      ? 'linear-gradient(90deg, #10b981 0%, #1fb6d6 100%)'
+                    background: isStageFinished
+                      ? '#1D4ED8'
                       : isActive
-                      ? 'linear-gradient(90deg, #1fb6d6 0%, #38bdf8 100%)'
+                      ? '#1D4ED8'
                       : 'transparent',
-                    width: isComplete ? '100%' : isActive ? '60%' : '0%',
-                    transition: 'width 1.2s ease-in-out',
-                    boxShadow: isActive ? '0 0 8px #1fb6d6' : 'none',
+                    width: isDone || stepIndex > idx ? '100%' : (isRunning && stepIndex === idx ? '100%' : '0%'),
+                    transition: 'width 0.4s ease',
                   }} />
                 </div>
               )}
@@ -335,7 +337,6 @@ export default function ProtocolProcessFlow({
           gap: 12,
           animation: 'qds-appear 0.25s ease',
         }}>
-          <span style={{ fontSize: 16 }}>{STAGES[stepIndex].icon}</span>
           <div style={{ flex: 1 }}>
             <div style={{ fontSize: 11, fontWeight: 800, color: 'var(--lab-text)' }}>
               {STAGES[stepIndex].activeDesc}
@@ -346,7 +347,7 @@ export default function ProtocolProcessFlow({
               {stepIndex === 2 && 'Executing quantum teleportation protocol over Bell pair entangled channel...'}
               {stepIndex === 3 && 'Evaluating quantum state fidelity, total variation distance, and JSD metrics...'}
               {stepIndex === 4 && 'Evaluating Signature, Identity, Replay, and Quantum deterministic gates...'}
-              {stepIndex === 5 && 'Transmitting final decision to Bob and verifying protocol state consensus...'}
+              {stepIndex === 5 && 'Transmitting final decision to receiver and verifying protocol state consensus...'}
             </div>
           </div>
           <div style={{

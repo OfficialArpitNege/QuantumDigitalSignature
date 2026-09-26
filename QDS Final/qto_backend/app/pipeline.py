@@ -119,22 +119,23 @@ def run_full_pipeline(
         # Aggregate fidelity-based approximation of expected vs observed Bloch vectors.
         # Each qubit bit encodes theta=0 (|0>) or theta=pi (|1>); Z-expectation = cos(theta).
         n = len(qubit_data)
-        # For a bit=0 state |0>, <Z>=+1, <X>=0, <Y>=0
-        # For a bit=1 state |1>, <Z>=-1, <X>=0, <Y>=0
+        per_qubit_devs = [2.0 * (1.0 - q["fidelity"]) for q in qubit_data]
+        per_qubit_tvs = [1.0 - q["fidelity"] for q in qubit_data]
+
+        vec_dev = float(sum(per_qubit_devs) / n)
+        tv = float(sum(per_qubit_tvs) / n)
+        jsd = tv
+        qber_proxy = 1.0 - avg_fidelity  # higher fidelity loss -> higher error proxy
+
         expected_z = sum(1.0 if q["input_bit"] == 0 else -1.0 for q in qubit_data) / n
         observed_z = sum(
-            (1.0 if q["input_bit"] == 0 else -1.0) * q["fidelity"] for q in qubit_data
+            (1.0 if q["input_bit"] == 0 else -1.0) * (2.0 * q["fidelity"] - 1.0) for q in qubit_data
         ) / n
         expected_vec = {"X": 0.0, "Y": 0.0, "Z": expected_z}
         observed_vec = {"X": 0.0, "Y": 0.0, "Z": observed_z}
 
         expected_probs = {"+": max(0.0, (1 + expected_z) / 2), "-": max(0.0, (1 - expected_z) / 2)}
         observed_probs = {"+": max(0.0, (1 + observed_z) / 2), "-": max(0.0, (1 - observed_z) / 2)}
-
-        vec_dev = vector_deviation(expected_vec, observed_vec)
-        tv = total_variation(expected_probs, observed_probs)
-        jsd = js_divergence(expected_probs, observed_probs)
-        qber_proxy = 1.0 - avg_fidelity  # higher fidelity loss -> higher error proxy
     else:
         expected_vec = {"X": 0.0, "Y": 0.0, "Z": 1.0}
         observed_vec = {"X": 0.0, "Y": 0.0, "Z": 1.0}
@@ -167,6 +168,8 @@ def run_full_pipeline(
         quantum_valid=verification.quantum_valid,
         unauthorized_attempt=(attack_type == "unauthorized_verification"),
         attack_type="auto",
+        vector_dev=vec_dev,
+        tv=tv,
     )
 
     t_end = time.perf_counter()

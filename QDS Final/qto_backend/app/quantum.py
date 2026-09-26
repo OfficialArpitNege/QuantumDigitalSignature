@@ -212,14 +212,14 @@ def apply_attack(state: np.ndarray, attack: str, strength: float) -> np.ndarray:
         out = rz @ rx @ state
 
     elif attack == "impersonation":
-        # Impersonation introduces unitary rotation along both X and Y axes
+        # Impersonation introduces unitary rotation along both Y and Z axes
         angle = strength * math.pi
-        rx = math.cos(angle / 2) * I - 1j * math.sin(angle / 2) * X
+        rz = math.cos(angle / 4) * I - 1j * math.sin(angle / 4) * Z
         ry = np.array([
             [math.cos(angle / 2), -math.sin(angle / 2)],
             [math.sin(angle / 2), math.cos(angle / 2)]
         ], dtype=complex)
-        out = rx @ ry @ state
+        out = rz @ ry @ state
 
     else:
         raise ValueError(f"Unknown attack type: {attack}")

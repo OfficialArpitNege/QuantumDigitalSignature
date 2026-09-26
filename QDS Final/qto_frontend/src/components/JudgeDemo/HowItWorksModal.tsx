@@ -5,8 +5,8 @@ interface Props {
 
 const STEPS = [
   {
-    n: '01', title: 'Alice Signs', color: '#0284c7',
-    body: 'Alice generates a SHA-256 hash of her message, then signs it using HMAC-SHA256 with a session nonce and session ID. This is the prototype classical signing layer.',
+    n: '01', title: 'Sender Signs', color: '#0284c7',
+    body: 'The sender generates a SHA-256 hash of the message, then signs it using HMAC-SHA256 with a session nonce and session ID. This is the prototype classical signing layer.',
   },
   {
     n: '02', title: 'Quantum Encoding', color: '#7c3aed',
@@ -14,19 +14,19 @@ const STEPS = [
   },
   {
     n: '03', title: 'Bell Pair Entanglement', color: '#d97706',
-    body: 'An entangled Bell pair |Φ+⟩ = (|00⟩ + |11⟩) / √2 is established. One qubit goes to Alice (for Bell measurement), the other to Bob (for Pauli correction).',
+    body: 'An entangled Bell pair |Φ+⟩ = (|00⟩ + |11⟩) / √2 is established. One qubit goes to the sender (for Bell measurement), the other to the receiver (for Pauli correction).',
   },
   {
     n: '04', title: 'Quantum Teleportation', color: '#059669',
-    body: "Alice performs a Bell-basis measurement on (|ψ⟩, her EPR qubit), obtaining two classical bits. She sends these bits to Bob. Bob applies the Pauli ZX correction to recover |ψ⟩.",
+    body: "The sender performs a Bell-basis measurement on (|ψ⟩, the EPR qubit), obtaining two classical bits and transmitting them to the receiver. The receiver applies the Pauli ZX correction to recover |ψ⟩.",
   },
   {
-    n: '05', title: 'Eve May Attack', color: '#dc2626',
-    body: 'Eve can attempt: Forgery (tamper with signature), Replay (re-send old session), Channel Manipulation (introduce quantum noise), Impersonation (fake Alice identity), or Unauthorized Verification.',
+    n: '05', title: 'Attacker May Attack', color: '#dc2626',
+    body: 'The attacker can attempt: Forgery (tamper with signature), Replay (re-send old session), Channel Manipulation (introduce quantum noise), Impersonation (fake sender identity), or Unauthorized Verification.',
   },
   {
-    n: '06', title: 'Bob Measures', color: '#0284c7',
-    body: 'Bob receives and corrects the qubit, then performs projective X, Y, Z measurements. He computes Bloch expectations and statistical quantities: Fidelity F, TV Distance D_TV, and JSD.',
+    n: '06', title: 'Receiver Measures', color: '#0284c7',
+    body: 'The receiver receives and corrects the qubit, then performs projective X, Y, Z measurements. The receiver computes Bloch expectations and statistical quantities: Fidelity F, TV Distance D_TV, and JSD.',
   },
   {
     n: '07', title: 'Deterministic Decision', color: '#059669',
@@ -123,7 +123,7 @@ export default function HowItWorksModal({ isOpen, onClose }: Props) {
                 {s.rule ? (
                   <div>
                     <div style={{ fontSize: 12, color: '#475569', lineHeight: 1.6, marginBottom: 8 }}>
-                      Bob evaluates all four checks deterministically:
+                      The receiver evaluates all four checks deterministically:
                     </div>
                     <div style={{
                       fontFamily: "'JetBrains Mono', monospace",

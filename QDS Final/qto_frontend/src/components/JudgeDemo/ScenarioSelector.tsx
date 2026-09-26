@@ -3,8 +3,7 @@ export type ExtendedAttackType =
   | 'forgery'
   | 'replay'
   | 'channel_manipulation'
-  | 'impersonation'
-  | 'unauthorized_verification';
+  | 'impersonation';
 
 interface ScenarioDef {
   id: ExtendedAttackType;
@@ -21,7 +20,6 @@ export const SCENARIOS: ScenarioDef[] = [
   { id: 'replay',                  icon: '↩', label: 'REPLAY',            short: 'Old session replayed',        color: '#7c6cf6', eveRole: 'Session Replay' },
   { id: 'channel_manipulation',    icon: '⚡', label: 'CHANNEL NOISE',     short: 'Quantum channel perturbed',   color: '#06b6d4', eveRole: 'Quantum Channel Noise' },
   { id: 'impersonation',           icon: '👤', label: 'IMPERSONATION',     short: 'Identity spoofing',           color: '#8b5cf6', eveRole: 'Identity Spoofing' },
-  { id: 'unauthorized_verification', icon: '⛔', label: 'UNAUTH VERIFY', short: 'Unauthorized verification',   color: '#3b82f6', eveRole: 'Unauthorized Verification' },
 ];
 
 interface Props {
@@ -38,13 +36,10 @@ export default function ScenarioSelector({ selectedAttack, onSelect }: Props) {
           fontWeight: 800,
           textTransform: 'uppercase',
           letterSpacing: '0.12em',
-          color: '#1fb6d6',
-          fontFamily: "'IBM Plex Mono', monospace",
+          color: '#0F0F0F',
+          fontFamily: "'JetBrains Mono', monospace",
         }}>
           THREAT SCENARIO
-        </span>
-        <span style={{ fontSize: 11, color: 'var(--lab-text-sub)' }}>
-          Select an attack scenario to perturb the quantum link
         </span>
       </div>
 
@@ -58,22 +53,23 @@ export default function ScenarioSelector({ selectedAttack, onSelect }: Props) {
               title={sc.short}
               className={`scenario-card ${sel ? 'selected' : ''}`}
               style={{
-                background: sel ? sc.color : 'var(--card-bg)',
-                border: `1.5px solid ${sel ? sc.color : 'var(--card-border)'}`,
-                boxShadow: sel ? `0 6px 20px ${sc.color}50` : 'none',
+                background: sel ? '#FEF08A' : '#FAF9F5',
+                border: '2px solid #0F0F0F',
+                boxShadow: sel ? '3px 3px 0px #0F0F0F' : '2px 2px 0px #0F0F0F',
               }}
             >
-              <div style={{ fontSize: 18, lineHeight: 1, marginBottom: 4 }}>{sc.icon}</div>
+              <div style={{ fontSize: 16, lineHeight: 1, marginBottom: 4 }}>{sc.icon}</div>
               <div style={{
                 fontSize: 10.5,
                 fontWeight: 800,
                 textTransform: 'uppercase',
                 letterSpacing: '0.06em',
-                color: sel ? '#ffffff' : 'var(--card-text)',
+                color: '#0F0F0F',
                 lineHeight: 1.2,
                 marginBottom: 2,
+                fontFamily: "'JetBrains Mono', monospace",
               }}>{sc.label}</div>
-              <div style={{ fontSize: 9.5, color: sel ? 'rgba(255,255,255,0.85)' : 'var(--card-text-sub)', lineHeight: 1.3 }}>
+              <div style={{ fontSize: 9.5, color: '#444444', lineHeight: 1.3, fontFamily: "'JetBrains Mono', monospace" }}>
                 {sc.short}
               </div>
             </button>

@@ -93,10 +93,28 @@ def test_phase8_statistical_evidence_isolation_from_decision():
     assert "evidence" in det
     print("Statistical engine evidence isolation test PASSED!\n")
 
+def test_phase8_forgery_threat_monotonicity():
+    print("--- Phase 8 Test 6: Forgery Threat Score Monotonicity ---")
+    from app.pipeline import run_full_pipeline
+    model = QDSProtocolModel()
+    strengths = [0.1, 0.35, 0.6, 0.85, 1.0]
+    scores = []
+
+    for strg in strengths:
+        res = run_full_pipeline(model, "Monotonicity Test", attack_type="forgery", attack_strength=strg)
+        scores.append(res["threat_assessment"]["threat_score"])
+
+    for i in range(len(scores) - 1):
+        assert scores[i] < scores[i+1], f"Non-monotonic threat score: strength {strengths[i]} ({scores[i]}) vs strength {strengths[i+1]} ({scores[i+1]})"
+
+    print(f"Monotonicity verified across strengths {strengths}: {scores}")
+    print("Forgery threat score monotonicity test PASSED!\n")
+
 if __name__ == "__main__":
     test_phase8_no_attack_close_to_expected()
     test_phase8_attack_statistical_deviation()
     test_phase8_valid_probability_ranges_and_metrics()
     test_phase8_confidence_intervals_and_standard_error()
     test_phase8_statistical_evidence_isolation_from_decision()
+    test_phase8_forgery_threat_monotonicity()
     print("ALL PHASE 8 STATISTICAL DETECTION TESTS PASSED SUCCESSFULLY!")

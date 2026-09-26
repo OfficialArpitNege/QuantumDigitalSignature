@@ -49,10 +49,13 @@ def detect(expected, observed, expected_probs=None, observed_probs=None,
            verification_success_rate=None, identity_failure_rate=None,
            duplicate_detected=False, freshness_ok=True, attack_type=None,
            signature_valid=True, identity_valid=True, quantum_valid=True,
-           unauthorized_attempt=False):
-    vector_dev = vector_deviation(expected, observed)
+           unauthorized_attempt=False, vector_dev=None, tv=None):
+    if vector_dev is None:
+        vector_dev = vector_deviation(expected, observed)
     norm_dev = min(1.0, vector_dev / 2.0)
-    tv = total_variation(expected_probs or {}, observed_probs or {}) if expected_probs is not None and observed_probs is not None else 0.0
+
+    if tv is None:
+        tv = total_variation(expected_probs or {}, observed_probs or {}) if expected_probs is not None and observed_probs is not None else 0.0
     jsd = js_divergence(expected_probs or {}, observed_probs or {}) if expected_probs is not None and observed_probs is not None else 0.0
 
     # Always classify attack automatically from evidence (attack-blind detection)

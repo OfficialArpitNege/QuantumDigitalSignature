@@ -46,7 +46,7 @@ export default function NetworkFlow({ attackType, stepProgress, isRunning }: Pro
               Teleportation Channel Pipeline
             </span>
             <div style={{ fontSize: 16, fontWeight: 700, color: '#f8fafc' }}>
-              Alice (Sender) ── EPR Pair (|Φ+⟩) ──▶ Bob (Verifier)
+              Sender ── EPR Pair (|Φ+⟩) ──▶ Receiver (Verifier)
             </div>
           </div>
           <div
@@ -81,7 +81,7 @@ export default function NetworkFlow({ attackType, stepProgress, isRunning }: Pro
             }}
           >
             <div style={{ fontSize: 32, marginBottom: 4 }}>👩‍💻</div>
-            <div style={{ fontWeight: 800, fontSize: 16, color: '#f8fafc' }}>ALICE</div>
+            <div style={{ fontWeight: 800, fontSize: 16, color: '#f8fafc' }}>SENDER</div>
             <div style={{ fontSize: 11, color: '#38bdf8', fontWeight: 600 }}>Legitimate Sender</div>
             <div
               style={{
@@ -167,7 +167,7 @@ export default function NetworkFlow({ attackType, stepProgress, isRunning }: Pro
                 }}
               >
                 <div style={{ fontSize: 13, fontWeight: 800, color: '#f87171' }}>
-                  🕵️‍♀️ EVE ({getAttackLabel(attackType)})
+                  🕵️‍♀️ ATTACKER ({getAttackLabel(attackType)})
                 </div>
                 <div style={{ fontSize: 10, color: '#fca5a5' }}>
                   Interceptors Active on Quantum Channel
@@ -183,12 +183,12 @@ export default function NetworkFlow({ attackType, stepProgress, isRunning }: Pro
                   fontStyle: 'italic',
                 }}
               >
-                Eve Status: Inactive (No Attack Detected)
+                Attacker Status: Inactive (No Attack Detected)
               </div>
             )}
           </div>
 
-          {/* BOB NODE */}
+          {/* RECEIVER NODE */}
           <div
             style={{
               background: '#1e293b',
@@ -202,7 +202,7 @@ export default function NetworkFlow({ attackType, stepProgress, isRunning }: Pro
             }}
           >
             <div style={{ fontSize: 32, marginBottom: 4 }}>👨‍🔬</div>
-            <div style={{ fontWeight: 800, fontSize: 16, color: '#f8fafc' }}>BOB</div>
+            <div style={{ fontWeight: 800, fontSize: 16, color: '#f8fafc' }}>RECEIVER</div>
             <div style={{ fontSize: 11, color: '#10b981', fontWeight: 600 }}>Receiver / Verifier</div>
             <div
               style={{

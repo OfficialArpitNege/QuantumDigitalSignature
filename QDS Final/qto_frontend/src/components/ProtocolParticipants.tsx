@@ -32,7 +32,7 @@ export default function ProtocolParticipants({ attackType, isThreatDetected = fa
         </div>
 
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 16 }}>
-          {/* Alice Node */}
+          {/* Sender Node */}
           <div
             style={{
               background: '#ffffff',
@@ -45,7 +45,7 @@ export default function ProtocolParticipants({ attackType, isThreatDetected = fa
             }}
           >
             <div style={{ fontSize: 24, marginBottom: 4 }}>👩‍💻</div>
-            <div style={{ fontWeight: 800, fontSize: 16, color: '#1e293b' }}>Alice</div>
+            <div style={{ fontWeight: 800, fontSize: 16, color: '#1e293b' }}>Sender</div>
             <div style={{ fontSize: 11, color: '#3b82f6', fontWeight: 600 }}>Legitimate Sender</div>
           </div>
 
@@ -70,7 +70,7 @@ export default function ProtocolParticipants({ attackType, isThreatDetected = fa
               />
             </div>
 
-            {/* Eve interceptor indicator if threat detected */}
+            {/* Attacker interceptor indicator if threat detected */}
             {isAttackConfigured && (
               <div
                 style={{
@@ -85,12 +85,12 @@ export default function ProtocolParticipants({ attackType, isThreatDetected = fa
                   color: isThreatDetected ? '#dc2626' : '#475569',
                 }}
               >
-                🕵️‍♀️ Eve ({formatAttackName(attackType)}) {isThreatDetected ? 'Threat Intercepted' : 'Channel Tapped'}
+                🕵️‍♀️ Attacker ({formatAttackName(attackType)}) {isThreatDetected ? 'Threat Intercepted' : 'Channel Tapped'}
               </div>
             )}
           </div>
 
-          {/* Bob Node */}
+          {/* Receiver Node */}
           <div
             style={{
               background: '#ffffff',
@@ -103,7 +103,7 @@ export default function ProtocolParticipants({ attackType, isThreatDetected = fa
             }}
           >
             <div style={{ fontSize: 24, marginBottom: 4 }}>👨‍🔬</div>
-            <div style={{ fontWeight: 800, fontSize: 16, color: '#1e293b' }}>Bob</div>
+            <div style={{ fontWeight: 800, fontSize: 16, color: '#1e293b' }}>Receiver</div>
             <div style={{ fontSize: 11, color: '#10b981', fontWeight: 600 }}>Legitimate Receiver</div>
           </div>
         </div>
@@ -111,10 +111,10 @@ export default function ProtocolParticipants({ attackType, isThreatDetected = fa
 
       {/* Participants Detail Cards Grid */}
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 16 }}>
-        {/* Alice Card */}
+        {/* Sender Card */}
         <div className="card" style={{ borderTop: '4px solid #3b82f6' }}>
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 10 }}>
-            <span style={{ fontWeight: 800, fontSize: 16 }}>Alice</span>
+            <span style={{ fontWeight: 800, fontSize: 16 }}>Sender</span>
             <span style={{ fontSize: 11, fontWeight: 700, background: '#dbeafe', color: '#1d4ed8', padding: '2px 8px', borderRadius: 12 }}>
               ACTIVE
             </span>
@@ -129,10 +129,10 @@ export default function ProtocolParticipants({ attackType, isThreatDetected = fa
           </ul>
         </div>
 
-        {/* Bob Card */}
+        {/* Receiver Card */}
         <div className="card" style={{ borderTop: '4px solid #10b981' }}>
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 10 }}>
-            <span style={{ fontWeight: 800, fontSize: 16 }}>Bob</span>
+            <span style={{ fontWeight: 800, fontSize: 16 }}>Receiver</span>
             <span style={{ fontSize: 11, fontWeight: 700, background: '#d1fae5', color: '#047857', padding: '2px 8px', borderRadius: 12 }}>
               ACTIVE
             </span>
@@ -141,16 +141,16 @@ export default function ProtocolParticipants({ attackType, isThreatDetected = fa
             Legitimate Receiver / Verifier
           </div>
           <ul style={{ fontSize: 12, color: 'var(--text-secondary)', paddingLeft: 16, margin: 0, lineHeight: 1.5 }}>
-            <li>Receives teleported states & applies Pauli correction</li>
+            <li>Receives teleported states &amp; applies Pauli correction</li>
             <li>Performs X, Y, Z projective measurements</li>
             <li>Executes formal deterministic protocol verification</li>
           </ul>
         </div>
 
-        {/* Eve Card */}
+        {/* Attacker Card */}
         <div className="card" style={{ borderTop: `4px solid ${isThreatDetected ? '#ef4444' : '#94a3b8'}` }}>
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 10 }}>
-            <span style={{ fontWeight: 800, fontSize: 16 }}>Eve</span>
+            <span style={{ fontWeight: 800, fontSize: 16 }}>Attacker</span>
             <span
               style={{
                 fontSize: 11,

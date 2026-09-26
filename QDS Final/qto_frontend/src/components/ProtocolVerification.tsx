@@ -53,7 +53,6 @@ export default function ProtocolVerification({ verification }: Props) {
                 marginTop: 2,
               }}
             >
-              <span>{isAccept ? '✓' : '✗'}</span>
               <span>{verification.decision}</span>
             </div>
           </div>

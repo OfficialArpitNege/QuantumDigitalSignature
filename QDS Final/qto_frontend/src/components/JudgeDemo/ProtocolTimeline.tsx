@@ -40,10 +40,11 @@ export default function ProtocolTimeline({ currentStageIndex, isCompleted }: Pro
               <div
                 style={{
                   height: 6,
-                  borderRadius: 3,
-                  background: isDone ? '#10b981' : isActive ? '#38bdf8' : '#e2e8f0',
-                  boxShadow: isActive ? '0 0 8px #38bdf8' : 'none',
-                  transition: 'all 0.3s ease',
+                  borderRadius: 2,
+                  border: '1px solid #0F0F0F',
+                  background: isDone ? '#1D4ED8' : isActive ? '#DC2626' : '#FAF9F5',
+                  boxShadow: isActive ? '2px 2px 0px #0F0F0F' : 'none',
+                  transition: 'all 0.2s ease',
                   marginBottom: 6,
                 }}
               />
@@ -51,10 +52,11 @@ export default function ProtocolTimeline({ currentStageIndex, isCompleted }: Pro
                 style={{
                   fontSize: 10,
                   fontWeight: isActive || isDone ? 700 : 500,
-                  color: isDone ? '#059669' : isActive ? '#0284c7' : '#94a3b8',
+                  color: isDone ? '#1D4ED8' : isActive ? '#DC2626' : 'var(--text-muted)',
                   whiteSpace: 'nowrap',
                   overflow: 'hidden',
                   textOverflow: 'ellipsis',
+                  fontFamily: 'JetBrains Mono, monospace',
                 }}
               >
                 {label}

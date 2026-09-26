@@ -1,3 +1,4 @@
+import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useSimulator } from '../../context/SimulatorContext';
 import ScenarioSelector from '../../components/JudgeDemo/ScenarioSelector';
@@ -5,9 +6,12 @@ import ProtocolNetwork from '../../components/JudgeDemo/ProtocolNetwork';
 import ProtocolProcessFlow from '../../components/JudgeDemo/ProtocolProcessFlow';
 import LoadingState from '../../components/LoadingState';
 import ErrorState from '../../components/ErrorState';
+import { ResultModal } from '../../components/ResultModal';
+import AliceBobConsole from '../../components/JudgeDemo/AliceBobConsole';
 
 export default function ExperimentPage() {
   const navigate = useNavigate();
+  const [modalOpen, setModalOpen] = useState(false);
   const {
     scenarioAttack,
     handleScenarioSelect,
@@ -27,12 +31,17 @@ export default function ExperimentPage() {
     checksRevealed,
     runProtocol,
     fullPipelineData,
-    setShowModal,
   } = useSimulator();
 
   const hasResults = !!fullPipelineData;
   const isDone = hasResults && !loading;
   const verdict = fullPipelineData?.verification.decision;
+
+  useEffect(() => {
+    if (isDone && verdict) {
+      setModalOpen(true);
+    }
+  }, [isDone, verdict]);
 
   return (
     <div>
@@ -50,42 +59,23 @@ export default function ExperimentPage() {
         <div style={{ display: 'flex', alignItems: 'center', gap: 14, flexWrap: 'wrap' }}>
           <div>
             <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 4 }}>
-              <span className="eyebrow" style={{ color: '#cc0000', margin: 0 }}>
+              <span className="eyebrow" style={{ color: '#0F0F0F', margin: 0, fontFamily: "'JetBrains Mono', monospace", fontWeight: 800 }}>
                 QUANTUM SECURITY LAB
               </span>
-              <span style={{
-                fontSize: 9, fontWeight: 800, textTransform: 'uppercase', letterSpacing: '0.08em',
-                background: 'rgba(204, 0, 0, 0.12)', color: '#cc0000',
-                border: '1px solid rgba(204, 0, 0, 0.3)', padding: '2px 8px', borderRadius: 100,
-              }}>Research Prototype</span>
             </div>
             <h1 style={{
               fontSize: 'clamp(20px, 2.4vw, 26px)',
               fontWeight: 800,
               lineHeight: 1.2,
-              color: 'var(--lab-text)',
+              color: '#0F0F0F',
               margin: 0,
               letterSpacing: '-0.01em',
+              fontFamily: "'Space Grotesk', sans-serif",
             }}>
               Teleportation-Based Signature &amp; Threat Detection
             </h1>
           </div>
         </div>
-
-        <button
-          onClick={() => setShowModal(true)}
-          style={{
-            background: 'rgba(204, 0, 0, 0.08)',
-            border: '1px solid rgba(204, 0, 0, 0.3)',
-            color: '#cc0000',
-            padding: '7px 16px',
-            borderRadius: 100,
-            fontSize: 12,
-            fontWeight: 700,
-            cursor: 'pointer',
-            whiteSpace: 'nowrap',
-          }}
-        >📖 How It Works</button>
       </div>
 
       {/* ══════════════════════════════════════════════════
@@ -96,7 +86,27 @@ export default function ExperimentPage() {
         {/* 1. Experiment Scenario Selector */}
         <ScenarioSelector selectedAttack={scenarioAttack} onSelect={handleScenarioSelect} />
 
-        {/* 2. Quantum Channel Visualization Hero */}
+        {/* 2. Interactive Transmission & Receiver Console */}
+        <AliceBobConsole
+          message={message}
+          setMessage={setMessage}
+          scenarioAttack={scenarioAttack}
+          attackStrength={attackStrength}
+          setAttackStrength={setAttackStrength}
+          loading={loading}
+          isDone={isDone}
+          verdict={verdict}
+          verification={fullPipelineData?.verification}
+          onRunProtocol={runProtocol}
+          showAdvanced={showAdvanced}
+          setShowAdvanced={setShowAdvanced}
+          shots={shots}
+          setShots={setShots}
+          maxSymbols={maxSymbols}
+          setMaxSymbols={setMaxSymbols}
+        />
+
+        {/* 3. Quantum Channel Visualization Hero */}
         <ProtocolNetwork
           attackType={scenarioAttack}
           stepIndex={stepIndex}
@@ -105,7 +115,7 @@ export default function ExperimentPage() {
           verdict={verdict}
         />
 
-        {/* 3. Real-Time Protocol Execution Flow */}
+        {/* 4. Real-Time Protocol Execution Flow */}
         <ProtocolProcessFlow
           stepIndex={stepIndex}
           isRunning={loading}
@@ -114,125 +124,6 @@ export default function ExperimentPage() {
           verification={fullPipelineData?.verification}
           checksRevealed={checksRevealed}
         />
-
-
-        {/* 3. Message Console & Primary Action Button */}
-        <div style={{
-          background: 'var(--lab-surface-2)',
-          border: '1px solid var(--lab-border)',
-          borderRadius: 16,
-          padding: '20px 24px',
-          display: 'flex',
-          alignItems: 'center',
-          gap: 20,
-          flexWrap: 'wrap',
-        }}>
-          {/* Message Payload Input */}
-          <div style={{ flex: 1, minWidth: 260 }}>
-            <label style={{
-              fontSize: 11, fontWeight: 800, textTransform: 'uppercase',
-              letterSpacing: '0.12em', color: '#1fb6d6', display: 'block', marginBottom: 6,
-              fontFamily: "'IBM Plex Mono', monospace",
-            }}>Alice's Message Payload</label>
-            <input
-              id="judge-message-input"
-              type="text"
-              value={message}
-              onChange={e => setMessage(e.target.value)}
-              onKeyDown={e => { if (e.key === 'Enter') runProtocol(); }}
-              placeholder="Enter message payload..."
-              style={{
-                width: '100%',
-                padding: '14px 18px',
-                border: '1px solid var(--lab-border)',
-                borderRadius: 12,
-                fontSize: 14,
-                fontFamily: "'JetBrains Mono', monospace",
-                fontWeight: 600,
-                color: 'var(--lab-text)',
-                background: 'var(--lab-bg)',
-                outline: 'none',
-                boxShadow: 'inset 0 2px 6px rgba(0,0,0,0.1)',
-              }}
-            />
-          </div>
-
-          {/* Attack Strength slider if attack selected */}
-          {scenarioAttack !== 'none' && (
-            <div style={{ minWidth: 160 }}>
-              <label style={{ fontSize: 11, fontWeight: 800, textTransform: 'uppercase', letterSpacing: '0.08em', color: 'var(--lab-text)', display: 'block', marginBottom: 6 }}>
-                Attack Intensity: {(attackStrength * 100).toFixed(0)}%
-              </label>
-              <input
-                type="range" min="0.1" max="1.0" step="0.05"
-                value={attackStrength}
-                onChange={e => setAttackStrength(parseFloat(e.target.value))}
-                style={{ width: '100%', accentColor: '#1fb6d6' }}
-              />
-            </div>
-          )}
-
-          {/* PRIMARY ACTION BUTTON */}
-          <button
-            id="run-protocol-btn"
-            onClick={runProtocol}
-            disabled={loading || !message.trim()}
-            className="lab-transmit-btn"
-            style={{
-              background: loading
-                ? '#64748b'
-                : 'linear-gradient(135deg, #1fb6d6 0%, #1e40af 100%)',
-              boxShadow: loading ? 'none' : '0 8px 24px rgba(31, 182, 214, 0.35)',
-            }}
-          >
-            {loading
-              ? <><span style={{ animation: 'qds-spin 0.7s linear infinite', display: 'inline-block' }}>⚙</span> Executing Quantum Protocol…</>
-              : <>▶ RUN PROTOCOL</>
-            }
-          </button>
-
-          {/* Advanced Config toggle */}
-          <button
-            onClick={() => setShowAdvanced(v => !v)}
-            style={{
-              background: 'transparent',
-              border: 'none',
-              color: 'var(--lab-text-sub)',
-              fontSize: 12,
-              fontWeight: 700,
-              cursor: 'pointer',
-              padding: '4px 8px',
-            }}
-          >{showAdvanced ? '▲ Config' : '⚙ Config'}</button>
-
-          {/* Advanced drawer */}
-          {showAdvanced && (
-            <div style={{
-              flex: '0 0 100%',
-              paddingTop: 16,
-              marginTop: 4,
-              borderTop: '1px solid var(--lab-border)',
-              display: 'grid',
-              gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))',
-              gap: 18,
-            }}>
-              <div>
-                <label style={{ fontSize: 10, fontWeight: 700, color: 'var(--lab-text-sub)', textTransform: 'uppercase', letterSpacing: '0.07em', display: 'block', marginBottom: 4 }}>
-                  Shots: {shots.toLocaleString()}
-                </label>
-                <input type="range" min="256" max="8192" step="256" value={shots}
-                  onChange={e => setShots(parseInt(e.target.value))} />
-              </div>
-              <div>
-                <label style={{ fontSize: 10, fontWeight: 700, color: 'var(--lab-text-sub)', textTransform: 'uppercase', letterSpacing: '0.07em', display: 'block', marginBottom: 4 }}>
-                  Max Symbols: {maxSymbols}
-                </label>
-                <input type="range" min="1" max="8" step="1" value={maxSymbols}
-                  onChange={e => setMaxSymbols(parseInt(e.target.value))} />
-              </div>
-            </div>
-          )}
-        </div>
       </div>
 
       {/* ══════════════════════════════════════════════════
@@ -333,11 +224,22 @@ export default function ExperimentPage() {
             Quantum Laboratory Console Ready
           </div>
           <div style={{ fontSize: 13, maxWidth: 440, margin: '0 auto', lineHeight: 1.6, color: 'var(--lab-text-sub)' }}>
-            Select an attack scenario above, configure Alice's payload, then click{' '}
+            Select an attack scenario above, configure the sender's payload, then click{' '}
             <strong style={{ color: '#cc0000' }}>▶ RUN PROTOCOL</strong> to initiate quantum teleportation.
           </div>
         </div>
       )}
+
+      <ResultModal
+        isOpen={modalOpen}
+        onClose={() => setModalOpen(false)}
+        verdict={verdict || null}
+        attackType={
+          fullPipelineData?.signature?.attack_type ||
+          (scenarioAttack !== 'none' ? scenarioAttack.toUpperCase() : 'None')
+        }
+        reason={fullPipelineData?.verification?.reason}
+      />
     </div>
   );
 }

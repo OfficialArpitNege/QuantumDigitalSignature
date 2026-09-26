@@ -16,9 +16,9 @@ function buildExplanation(v: ProtocolVerificationResult): string {
   if (v.decision === 'ACCEPT') {
     return (
       "All four deterministic verification checks passed: " +
-      "Alice's HMAC signature was cryptographically valid, the sender identity matched the authorised key, " +
-      "the session nonce was fresh (replay protection passed), and the quantum state received by Bob matched " +
-      "Alice's expected state with fidelity ≥ threshold. The protocol accepted the message."
+      "The sender's HMAC signature was cryptographically valid, the sender identity matched the authorised key, " +
+      "the session nonce was fresh (replay protection passed), and the quantum state received by the receiver matched " +
+      "the sender's expected state with fidelity ≥ threshold. The protocol accepted the message."
     );
   }
 
@@ -32,7 +32,7 @@ function buildExplanation(v: ProtocolVerificationResult): string {
   }
   if (!v.identity_valid) {
     failed.push(
-      "Identity verification failed — the sender identity did not match Alice's authorised key. " +
+      "Identity verification failed — the sender identity did not match the authorised sender key. " +
       "An unauthorised entity may have attempted to participate in this protocol session."
     );
   }
@@ -44,7 +44,7 @@ function buildExplanation(v: ProtocolVerificationResult): string {
   }
   if (!v.quantum_valid) {
     failed.push(
-      "Quantum state verification failed — the quantum state received by Bob did not match Alice's expected state. " +
+      "Quantum state verification failed — the quantum state received by the receiver did not match the sender's expected state. " +
       "The fidelity fell below the protocol threshold, indicating channel noise or active quantum manipulation."
     );
   }
@@ -64,9 +64,8 @@ function buildExplanation(v: ProtocolVerificationResult): string {
 
 export default function WhyExplanation({ verification }: Props) {
   const isAccept = verification.decision === 'ACCEPT';
-  const color  = isAccept ? '#10b981' : '#ef4444';
-  const bg     = isAccept ? 'rgba(16,185,129,0.06)' : 'rgba(239,68,68,0.06)';
-  const border = isAccept ? '1px solid rgba(16,185,129,0.2)' : '1px solid rgba(239,68,68,0.2)';
+  const bg     = '#FAF9F5';
+  const border = isAccept ? '2px solid #0F0F0F' : '2px solid #DC2626';
 
   const failedChecks = [
     !verification.signature_valid && 'Signature',
@@ -76,45 +75,36 @@ export default function WhyExplanation({ verification }: Props) {
   ].filter(Boolean) as string[];
 
   return (
-    <div style={{ background: bg, border, borderRadius: 10, padding: '14px 18px', marginBottom: 12 }}>
+    <div style={{ background: bg, border, borderRadius: 4, padding: '16px 20px', marginBottom: 12, boxShadow: '2px 2px 0px #0F0F0F' }}>
       <div style={{
-        fontSize: 10, fontWeight: 800, textTransform: 'uppercase',
-        letterSpacing: '0.1em', color, marginBottom: 6,
+        fontSize: 11, fontWeight: 800, textTransform: 'uppercase',
+        letterSpacing: '0.08em', color: '#0F0F0F', marginBottom: 6,
         display: 'flex', alignItems: 'center', gap: 6,
+        fontFamily: "'JetBrains Mono', monospace",
       }}>
-        💡 Why did the system make this decision?
+        WHY DID THE SYSTEM MAKE THIS DECISION?
       </div>
 
-      <div style={{ fontSize: 13, color: 'var(--lab-text)', lineHeight: 1.65, maxWidth: 800 }}>
+      <div style={{ fontSize: 13, color: '#0F0F0F', lineHeight: 1.65, maxWidth: 800, fontFamily: "'JetBrains Mono', monospace" }}>
         {buildExplanation(verification)}
       </div>
 
       {/* Failed check badges — shown only on REJECT with actual failures */}
       {!isAccept && failedChecks.length > 0 && (
-        <div style={{ display: 'flex', gap: 6, marginTop: 10, flexWrap: 'wrap' }}>
+        <div style={{ display: 'flex', gap: 8, marginTop: 12, flexWrap: 'wrap' }}>
           {failedChecks.map(c => (
             <span key={c} style={{
-              fontSize: 10, fontWeight: 800, padding: '2px 9px',
-              borderRadius: 20,
-              background: 'rgba(239,68,68,0.12)',
-              border: '1px solid rgba(239,68,68,0.3)',
-              color: '#ef4444',
+              fontSize: 11, fontWeight: 800, padding: '3px 10px',
+              borderRadius: 2,
+              background: '#FAF9F5',
+              border: '1.5px solid #0F0F0F',
+              color: '#0F0F0F',
+              fontFamily: "'JetBrains Mono', monospace",
+              boxShadow: '2px 2px 0px #0F0F0F',
             }}>
-              ✗ {c}
+              <span style={{ color: '#DC2626', marginRight: 4 }}>X</span> {c}
             </span>
           ))}
-        </div>
-      )}
-
-      {/* Backend reason (secondary detail) */}
-      {verification.reason && (
-        <div style={{
-          marginTop: 10, paddingTop: 8,
-          borderTop: `1px solid ${isAccept ? 'rgba(16,185,129,0.12)' : 'rgba(239,68,68,0.12)'}`,
-          fontSize: 11, color: 'var(--lab-text-muted, #64748b)',
-          fontFamily: "'JetBrains Mono', monospace",
-        }}>
-          Backend reason: {verification.reason}
         </div>
       )}
     </div>

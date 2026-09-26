@@ -2,7 +2,7 @@ import { useState, useCallback, useEffect, useRef } from 'react';
 import '../qds-lab.css';
 import type { AttackType, ExperimentResponse, SignResponse, FullPipelineResponse, PerformanceBenchmarkResponse, ForgeryBenchmarkResponse } from '../types/api';
 import { api } from '../services/api';
-import type { Theme } from '../components/ThemeToggle';
+
 
 // Diagnostic panels (below the fold)
 import WorkflowPipeline from '../components/WorkflowPipeline';
@@ -27,6 +27,7 @@ import HowItWorksModal from '../components/JudgeDemo/HowItWorksModal';
 import AttackBlindFlowModal from '../components/JudgeDemo/AttackBlindFlowModal';
 import ResearchResultsDashboard from '../components/JudgeDemo/ResearchResultsDashboard';
 import CollapsibleSection from '../components/JudgeDemo/CollapsibleSection';
+import AliceBobConsole from '../components/JudgeDemo/AliceBobConsole';
 
 type PipelineStatus = 'idle' | 'active' | 'complete' | 'anomaly';
 interface PipelineState { stages: Array<{ status: PipelineStatus }>; }
@@ -39,14 +40,7 @@ function makePipeline(hasAnomaly: boolean): PipelineState {
 
 const TIMELINE_STEPS = 9;
 
-interface DashboardProps {
-  theme?: Theme;
-  onToggleTheme?: () => void;
-}
-
-export default function Dashboard({ theme = 'light' }: DashboardProps) {
-  const isDark = theme === 'dark';
-
+export default function Dashboard() {
   // ── Scenario / config state ──────────────────────────────
   const [scenarioAttack, setScenarioAttack] = useState<ExtendedAttackType>('none');
   const [message, setMessage] = useState('HELLO QUANTUM');
@@ -275,124 +269,25 @@ export default function Dashboard({ theme = 'light' }: DashboardProps) {
               verdict={verdict}
             />
 
-            {/* 3. Message Console & Primary Action Button */}
-            <div style={{
-              background: 'var(--lab-surface-2)',
-              border: '1px solid var(--lab-border)',
-              borderRadius: 16,
-              padding: '20px 24px',
-              display: 'flex',
-              alignItems: 'center',
-              gap: 20,
-              flexWrap: 'wrap',
-            }}>
-              {/* Message Payload Input */}
-              <div style={{ flex: 1, minWidth: 260 }}>
-                <label style={{
-                  fontSize: 11, fontWeight: 800, textTransform: 'uppercase',
-                  letterSpacing: '0.12em', color: '#cc0000', display: 'block', marginBottom: 6,
-                  fontFamily: "'IBM Plex Mono', monospace",
-                }}>Alice's Message Payload</label>
-                <input
-                  id="judge-message-input"
-                  type="text"
-                  value={message}
-                  onChange={e => setMessage(e.target.value)}
-                  onKeyDown={e => { if (e.key === 'Enter') runProtocol(); }}
-                  placeholder="Enter message payload..."
-                  style={{
-                    width: '100%',
-                    padding: '14px 18px',
-                    border: '1px solid var(--lab-border)',
-                    borderRadius: 12,
-                    fontSize: 14,
-                    fontFamily: "'JetBrains Mono', monospace",
-                    fontWeight: 600,
-                    color: 'var(--lab-text)',
-                    background: 'var(--lab-bg)',
-                    outline: 'none',
-                    boxShadow: 'inset 0 2px 6px rgba(0,0,0,0.1)',
-                  }}
-                />
-              </div>
-
-              {/* Attack Strength slider if attack selected */}
-              {scenarioAttack !== 'none' && (
-                <div style={{ minWidth: 160 }}>
-                  <label style={{ fontSize: 11, fontWeight: 800, textTransform: 'uppercase', letterSpacing: '0.08em', color: '#ef4444', display: 'block', marginBottom: 6 }}>
-                    Attack Intensity: {(attackStrength * 100).toFixed(0)}%
-                  </label>
-                  <input
-                    type="range" min="0.1" max="1.0" step="0.05"
-                    value={attackStrength}
-                    onChange={e => setAttackStrength(parseFloat(e.target.value))}
-                    style={{ width: '100%', accentColor: '#ef4444' }}
-                  />
-                </div>
-              )}
-
-              {/* PRIMARY ACTION BUTTON */}
-              <button
-                id="run-protocol-btn"
-                onClick={runProtocol}
-                disabled={loading || !message.trim()}
-                className="lab-transmit-btn"
-                style={{
-                  background: loading
-                    ? '#64748b'
-                    : scenarioAttack === 'none'
-                      ? 'linear-gradient(135deg, #cc0000 0%, #8a0000 100%)'
-                      : 'linear-gradient(135deg, #ef4444 0%, #b91c1c 100%)',
-                }}
-              >
-                {loading
-                  ? <><span style={{ animation: 'qds-spin 0.7s linear infinite', display: 'inline-block' }}>⚙</span> Executing Quantum Protocol…</>
-                  : <>▶ RUN PROTOCOL{scenarioAttack !== 'none' ? ' + ATTACK' : ''}</>
-                }
-              </button>
-
-              {/* Advanced Config toggle */}
-              <button
-                onClick={() => setShowAdvanced(v => !v)}
-                style={{
-                  background: 'transparent',
-                  border: 'none',
-                  color: 'var(--lab-text-sub)',
-                  fontSize: 12,
-                  fontWeight: 700,
-                  cursor: 'pointer',
-                  padding: '4px 8px',
-                }}
-              >{showAdvanced ? '▲ Config' : '⚙ Config'}</button>
-
-              {/* Advanced drawer */}
-              {showAdvanced && (
-                <div style={{
-                  flex: '0 0 100%',
-                  paddingTop: 16,
-                  marginTop: 4,
-                  borderTop: '1px solid var(--lab-border)',
-                  display: 'grid',
-                  gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))',
-                  gap: 18,
-                }}>
-                  <div>
-                    <label style={{ fontSize: 10, fontWeight: 700, color: 'var(--lab-text-sub)', textTransform: 'uppercase', letterSpacing: '0.07em', display: 'block', marginBottom: 4 }}>
-                      Shots: {shots.toLocaleString()}
-                    </label>
-                    <input type="range" min="256" max="8192" step="256" value={shots}
-                      onChange={e => setShots(parseInt(e.target.value))} />
-                  </div>
-                  <div>
-                    <label style={{ fontSize: 10, fontWeight: 700, color: 'var(--lab-text-sub)', textTransform: 'uppercase', letterSpacing: '0.07em', display: 'block', marginBottom: 4 }}>
-                      Max Symbols: {maxSymbols}
-                    </label>
-                    <input type="range" min="1" max="8" step="1" value={maxSymbols}
-                      onChange={e => setMaxSymbols(parseInt(e.target.value))} />
-                  </div>
-                </div>
-              )}
-            </div>
+            {/* 3. Interactive Transmission & Receiver Console */}
+            <AliceBobConsole
+              message={message}
+              setMessage={setMessage}
+              scenarioAttack={scenarioAttack}
+              attackStrength={attackStrength}
+              setAttackStrength={setAttackStrength}
+              loading={loading}
+              isDone={isDone}
+              verdict={verdict}
+              verification={fullPipelineData?.verification}
+              onRunProtocol={runProtocol}
+              showAdvanced={showAdvanced}
+              setShowAdvanced={setShowAdvanced}
+              shots={shots}
+              setShots={setShots}
+              maxSymbols={maxSymbols}
+              setMaxSymbols={setMaxSymbols}
+            />
           </div>
 
           {/* ══════════════════════════════════════════════════
@@ -489,7 +384,7 @@ export default function Dashboard({ theme = 'light' }: DashboardProps) {
                 Quantum Laboratory Console Ready
               </div>
               <div style={{ fontSize: 13, maxWidth: 440, margin: '0 auto', lineHeight: 1.6, color: 'var(--lab-text-sub)' }}>
-                Select an attack scenario above, configure Alice's payload, then click{' '}
+                Select an attack scenario above, configure the sender's payload, then click{' '}
                 <strong style={{ color: '#cc0000' }}>▶ RUN PROTOCOL</strong> to initiate quantum teleportation.
               </div>
             </div>
@@ -510,7 +405,7 @@ export default function Dashboard({ theme = 'light' }: DashboardProps) {
             <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
               {/* Security architecture is already a self-contained, closed-by-default
                   accordion — reused verbatim here rather than re-wrapped. */}
-              <AttackBlindFlowModal attackType={scenarioAttack} isDark={isDark} />
+              <AttackBlindFlowModal attackType={scenarioAttack} />
 
               <CollapsibleSection title="Research Benchmarks" badge="Phase 15 Validated">
                 <ResearchResultsDashboard
@@ -518,7 +413,6 @@ export default function Dashboard({ theme = 'light' }: DashboardProps) {
                   forgeryData={forgeryData}
                   loading={benchmarkLoading}
                   onRunBenchmark={runResearchBenchmarks}
-                  isDark={isDark}
                 />
               </CollapsibleSection>
 

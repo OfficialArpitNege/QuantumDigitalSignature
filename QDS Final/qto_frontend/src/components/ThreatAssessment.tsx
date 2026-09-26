@@ -8,10 +8,10 @@ interface Props {
 type ThreatLevel = 'LOW' | 'MEDIUM' | 'HIGH' | 'CRITICAL';
 
 const LEVEL_CONFIG: Record<ThreatLevel, { cls: string; icon: string; verdict: string; textColor: string }> = {
-  LOW:      { cls: 'threat-low',      icon: '✓', verdict: 'LOW ANOMALY SIGNAL',  textColor: 'var(--threat-low)' },
-  MEDIUM:   { cls: 'threat-medium',   icon: '⚠', verdict: 'ANOMALY DETECTED',    textColor: 'var(--threat-med)' },
-  HIGH:     { cls: 'threat-high',     icon: '⛔', verdict: 'THREAT DETECTED',     textColor: 'var(--threat-high)' },
-  CRITICAL: { cls: 'threat-critical', icon: '🚨', verdict: 'CRITICAL THREAT',     textColor: 'var(--threat-crit)' },
+  LOW:      { cls: 'threat-low',      icon: '', verdict: 'LOW ANOMALY SIGNAL',  textColor: 'var(--threat-low)' },
+  MEDIUM:   { cls: 'threat-medium',   icon: '', verdict: 'ANOMALY DETECTED',    textColor: 'var(--threat-med)' },
+  HIGH:     { cls: 'threat-high',     icon: '', verdict: 'THREAT DETECTED',     textColor: 'var(--threat-high)' },
+  CRITICAL: { cls: 'threat-critical', icon: '', verdict: 'CRITICAL THREAT',     textColor: 'var(--threat-crit)' },
 };
 
 function aggregateResults(data: ExperimentResponse) {

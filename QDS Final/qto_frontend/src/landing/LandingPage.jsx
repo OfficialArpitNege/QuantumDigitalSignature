@@ -1,4 +1,4 @@
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
@@ -6,13 +6,14 @@ import Scene from './components/Scene.jsx';
 import Nav from './components/Nav.jsx';
 import StatsPanel from './sections/StatsPanel.jsx';
 import DecisionSection from './sections/DecisionSection.jsx';
-import { setProgress, scrollStore } from './scrollStore.js';
+import { setProgress, subscribe, scrollStore } from './scrollStore.js';
 import './landing.css';
 
 gsap.registerPlugin(ScrollTrigger);
 
 export default function LandingPage() {
   const navigate = useNavigate();
+  const [hasScrolled, setHasScrolled] = useState(false);
 
   useEffect(() => {
     const trigger = ScrollTrigger.create({
@@ -27,8 +28,14 @@ export default function LandingPage() {
     };
   }, []);
 
-  const scrollToAlice = () => {
-    document.getElementById('s-alice')?.scrollIntoView({
+  useEffect(() => {
+    return subscribe((t) => {
+      setHasScrolled(t > 0.015);
+    });
+  }, []);
+
+  const scrollToSender = () => {
+    (document.getElementById('s-sender') || document.getElementById('s-alice'))?.scrollIntoView({
       behavior: scrollStore.reducedMotion ? 'auto' : 'smooth',
     });
   };
@@ -41,43 +48,101 @@ export default function LandingPage() {
       <div className="scroller">
         {/* 0. Hero */}
         <Section id="s-hero">
-          <Panel>
-            <p className="eyebrow text-cyan mb-2.5">Quantum Communication</p>
-            <h1 className="font-display font-semibold leading-[1.08] text-[clamp(34px,4.6vw,58px)] mb-3.5">
-              Secure messages travel through light itself.
-            </h1>
-            <p className="text-ink-soft font-light mb-1.5">
-              Scroll to follow a single message from Alice to Bob — and watch the network detect
-              an eavesdropper along the way.
-            </p>
-            <div className="flex flex-wrap gap-4 items-center mt-6">
-              <button onClick={scrollToAlice} className="cta-button">
-                Begin the journey ↓
-              </button>
-              <button
-                onClick={() => navigate('/simulator')}
-                className="cta-button text-white shadow-lg hover:shadow-cyan-500/25"
-                style={{ background: 'linear-gradient(135deg, #1fb6d6, #4c5fd5)', padding: '16px 32px' }}
-              >
-                Start Simulation ⚛
-              </button>
+          <div className="hero-content-row">
+            <Panel maxWidth="580px">
+              <h1 className="font-display font-semibold leading-[1.1] text-[clamp(28px,3.8vw,48px)] mb-3.5">
+                QuantumShield: Teleportation-Based Quantum Digital Signature Threat Detection
+              </h1>
+              <p className="text-ink-soft font-light mb-2">
+                An entanglement-assisted Quantum Digital Signature (QDS) security architecture integrating quantum state preparation, teleportation-based transmission, controlled attack simulation, and real-time statistical threat classification.
+              </p>
+              <div className="flex flex-wrap gap-4 items-center mt-6">
+                <button onClick={scrollToSender} className="cta-button">
+                  Explore Pipeline ↓
+                </button>
+                <button
+                  onClick={() => navigate('/simulator')}
+                  className="cta-button"
+                  style={{
+                    background: '#1D4ED8',
+                    color: '#FFFFFF',
+                    border: '1.5px solid #0F0F0F',
+                    boxShadow: '2.5px 2.5px 0px #0F0F0F',
+                  }}
+                >
+                  Launch QDS Simulator ⚛
+                </button>
+              </div>
+            </Panel>
+
+            {/* Scroll Indicator Prompt in blank space on right */}
+            <div
+              className="hero-scroll-cue"
+              onClick={scrollToSender}
+              style={{
+                opacity: hasScrolled ? 0 : 1,
+                transform: hasScrolled ? 'translateY(16px)' : 'translateY(0)',
+                pointerEvents: hasScrolled ? 'none' : 'auto',
+              }}
+            >
+              <div style={{
+                width: '26px',
+                height: '40px',
+                borderRadius: '13px',
+                border: '2px solid #0F0F0F',
+                position: 'relative',
+                display: 'flex',
+                justifyContent: 'center',
+                paddingTop: '6px',
+                background: '#FFFFFF',
+              }}>
+                <div style={{
+                  width: '4px',
+                  height: '8px',
+                  borderRadius: '2px',
+                  background: '#1D4ED8',
+                  animation: 'qds-mouse-wheel 1.6s ease-in-out infinite',
+                }} />
+              </div>
+
+              <div>
+                <div style={{
+                  fontFamily: "'Space Grotesk', sans-serif",
+                  fontSize: '12px',
+                  fontWeight: 800,
+                  letterSpacing: '0.08em',
+                  color: '#0F0F0F',
+                  textTransform: 'uppercase',
+                  marginBottom: '4px',
+                }}>
+                  PLEASE SCROLL TO EXPLORE
+                </div>
+                <p style={{
+                  margin: 0,
+                  fontFamily: "'JetBrains Mono', monospace",
+                  fontSize: '11px',
+                  color: '#555555',
+                  lineHeight: 1.4,
+                }}>
+                  Follow quantum transmission from Sender to Receiver ↓
+                </p>
+              </div>
             </div>
-          </Panel>
+          </div>
         </Section>
 
-        {/* 1. Alice */}
-        <Section id="s-alice">
+        {/* 1. Sender */}
+        <Section id="s-sender">
           <Panel>
-            <p className="eyebrow text-cyan mb-2.5">01 · Sender</p>
+            <p className="eyebrow text-cyan mb-2.5">01 · Message &amp; Signature Generation</p>
             <h2 className="font-display font-semibold text-[clamp(26px,3.2vw,36px)] mb-3.5">
-              Alice
+              Sender Node
             </h2>
-            <p className="font-mono text-[13px] text-ink-soft mb-2">
-              Origin node · Quantum Channel A
+            <p className="font-mono text-[12px] text-ink-soft mb-2" style={{ fontFamily: "'JetBrains Mono', monospace", fontWeight: 700, color: '#555555' }}>
+              Origin Node · QDS State Preparation
             </p>
             <p className="text-ink-soft font-light">
-              Alice encodes a message into a quantum state, then commits it to the shared
-              channel.
+              The sender prepares the input message and generates the Quantum Digital Signature (QDS). Cryptographic quantum state commitments are established to ensure non-repudiation and prevent existential forgery.
             </p>
           </Panel>
         </Section>
@@ -85,13 +150,12 @@ export default function LandingPage() {
         {/* 2. Writing message */}
         <Section id="s-write">
           <Panel align="right">
-            <p className="eyebrow text-cyan mb-2.5">02 · Message Created</p>
+            <p className="eyebrow text-cyan mb-2.5">02 · Quantum Teleportation</p>
             <h2 className="font-display font-semibold text-[clamp(26px,3.2vw,36px)] mb-3.5">
-              Writing the message
+              Entangled State Distribution
             </h2>
             <p className="text-ink-soft font-light">
-              Each character is encoded as a qubit. As the state stabilizes, the message
-              assembles from particles in real time.
+              Entanglement and quantum teleportation transfer the required quantum state. Bell-state pairs are established across the link, transmitting the quantum state without direct physical cloning.
             </p>
           </Panel>
         </Section>
@@ -99,35 +163,33 @@ export default function LandingPage() {
         {/* 3. Channel */}
         <Section id="s-channel">
           <Panel align="center">
-            <p className="eyebrow text-cyan mb-2.5">03 · Quantum Channel</p>
+            <p className="eyebrow text-cyan mb-2.5">03 · Transmission Layer</p>
             <h2 className="font-display font-semibold text-[clamp(26px,3.2vw,36px)] mb-3.5">
-              Entering the channel
+              Quantum Communication Layer
             </h2>
             <p className="text-ink-soft font-light">
-              The message now travels as a single photon state along the entangled link
-              connecting Alice and Bob.
+              The quantum communication layer routes teleported states between endpoints while continuously monitoring state fidelity, phase coherence, and baseline Quantum Bit Error Rate (QBER).
             </p>
           </Panel>
         </Section>
 
-        {/* 4. Eve */}
-        <Section id="s-eve">
+        {/* 4. Attacker */}
+        <Section id="s-attacker">
           <Panel>
-            <p className="eyebrow text-threat mb-2.5">04 · Threat Detection</p>
+            <p className="eyebrow text-threat mb-2.5">04 · Attack Simulation Module</p>
             <h2 className="font-display font-semibold text-[clamp(26px,3.2vw,36px)] mb-3.5">
-              Eve
+              Attacker Node
             </h2>
-            <p className="font-mono text-[13px] text-ink-soft mb-2">
-              Unauthorized node · Interception attempt
+            <p className="font-mono text-[12px] text-ink-soft mb-2" style={{ fontFamily: "'JetBrains Mono', monospace", fontWeight: 700, color: '#DC2626' }}>
+              Channel Manipulation · Forgery &amp; Interception
             </p>
             <p className="text-ink-soft font-light">
-              Eve attempts to intercept the transmission. Any measurement of a quantum state
-              disturbs it — and the channel notices.
+              The framework simulates forgery, impersonation, replay, and channel manipulation attacks. Due to the No-Cloning Theorem, unauthorized measurement introduces detectable statistical disturbance into the quantum channel.
             </p>
           </Panel>
         </Section>
 
-        {/* 5. Stats - inside threat detection, before Bob */}
+        {/* 5. Stats - inside threat detection, before Receiver */}
         <Section id="s-stats">
           <StatsPanel />
         </Section>
@@ -137,39 +199,44 @@ export default function LandingPage() {
           <DecisionSection />
         </Section>
 
-        {/* 7. Bob */}
-        <Section id="s-bob">
+        {/* 7. Receiver */}
+        <Section id="s-receiver">
           <Panel align="right">
-            <p className="eyebrow text-violet mb-2.5">06 · Receiver</p>
+            <p className="eyebrow text-violet mb-2.5">06 · Signature Verification</p>
             <h2 className="font-display font-semibold text-[clamp(26px,3.2vw,36px)] mb-3.5">
-              Bob
+              Receiver Node
             </h2>
-            <p className="font-mono text-[13px] text-ink-soft mb-2">
-              Destination node · Quantum Channel B
+            <p className="font-mono text-[12px] text-ink-soft mb-2" style={{ fontFamily: "'JetBrains Mono', monospace", fontWeight: 700, color: '#555555' }}>
+              Destination Node · Projective Measurements
             </p>
             <p className="text-ink-soft font-light">
-              The verified message arrives intact. Bob decodes the quantum state and confirms
-              secure delivery.
+              The receiver performs projective quantum measurements to validate the received signature against expected patterns and predefined thresholds, ensuring origin authenticity and payload integrity.
             </p>
           </Panel>
         </Section>
 
         {/* 8. Final */}
         <Section id="s-final">
-          <Panel align="center">
-            <p className="eyebrow text-cyan mb-2.5">Secure Delivery</p>
+          <Panel align="center" maxWidth="560px">
+            <p className="eyebrow text-cyan mb-2.5">07 · Tamper-Evident Audit Layer</p>
             <h1 className="font-display font-semibold text-[clamp(28px,3.6vw,42px)] mb-3.5">
-              Secure communication starts here.
+              High-Assurance Cyber Threat Detection
             </h1>
             <p className="text-ink-soft font-light mb-1.5">
-              Every message on this network is verified before it arrives — no exceptions.
+              Legitimate communication is accepted, while anomalous behaviour is detected, classified, and recorded in a tamper-evident audit layer for defense, government, and financial operations.
             </p>
             <button
               onClick={() => navigate('/simulator')}
-              className="cta-button bg-cyan-600 text-white"
-              style={{ background: 'linear-gradient(135deg, #1fb6d6, #7c6cf6)' }}
+              className="cta-button"
+              style={{
+                background: '#1D4ED8',
+                color: '#FFFFFF',
+                border: '1.5px solid #0F0F0F',
+                boxShadow: '3px 3px 0px #0F0F0F',
+                marginTop: '12px',
+              }}
             >
-              Start Simulation ⚛
+              Launch QDS Simulation Platform ⚛
             </button>
           </Panel>
         </Section>
@@ -192,12 +259,12 @@ function Section({ id, children }) {
   );
 }
 
-function Panel({ children, align = 'left' }) {
+function Panel({ children, align = 'left', maxWidth = '520px' }) {
   const alignClass =
     align === 'right' ? 'ml-auto' : align === 'center' ? 'mx-auto text-center' : '';
   return (
-    <div className={`glass-panel max-w-[520px] pointer-events-auto ${alignClass}`}
-         style={{ padding: '38px 44px', display: 'flex', flexDirection: 'column', gap: '12px' }}>
+    <div className={`glass-panel pointer-events-auto ${alignClass}`}
+         style={{ maxWidth, padding: '38px 44px', display: 'flex', flexDirection: 'column', gap: '12px' }}>
       {children}
     </div>
   );

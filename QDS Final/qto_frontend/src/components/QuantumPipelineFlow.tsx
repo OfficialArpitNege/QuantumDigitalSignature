@@ -7,7 +7,7 @@ export default function QuantumPipelineFlow() {
     { label: 'BELL PAIR', sub: '|Φ⁺⟩ Entangled' },
     { label: 'TELEPORT', sub: 'Quantum Channel' },
     { label: 'MEASURE', sub: 'Bell Basis' },
-    { label: 'RECONSTRUCT', sub: 'Bob\'s State' },
+    { label: 'RECONSTRUCT', sub: 'Receiver\'s State' },
   ];
 
   return (

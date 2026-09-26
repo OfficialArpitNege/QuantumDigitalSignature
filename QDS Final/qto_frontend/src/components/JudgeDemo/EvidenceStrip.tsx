@@ -26,15 +26,9 @@ function statusIcon(ok: boolean | null): string {
   return ok ? '✓' : '✗';
 }
 
-function statusColor(ok: boolean | null): string {
-  if (ok === null) return '#64748b';
-  return ok ? '#10b981' : '#ef4444';
-}
-
 export default function EvidenceStrip({
   statisticalAnalysis,
   experimentData,
-  verification,
 }: Props) {
   // ── Prefer Phase 12 full-pipeline stats; fall back to legacy experiment data ──
   let avgFidelity: number | null = null;
@@ -79,7 +73,7 @@ export default function EvidenceStrip({
       threshold: '≥ 99.0%',
     },
     {
-      label: 'QBER PROXY ¹',
+      label: 'QBER PROXY',
       value: qberProxy !== null ? `${(qberProxy * 100).toFixed(0)}%` : 'N/A',
       ok: qberOk,
       threshold: '0% expected',
@@ -121,22 +115,21 @@ export default function EvidenceStrip({
   return (
     <div style={{ marginBottom: 16 }}>
       <div style={{ display: 'flex', alignItems: 'baseline', gap: 10, marginBottom: 6 }}>
-        <span style={{ fontSize: 11, fontWeight: 800, textTransform: 'uppercase', letterSpacing: '0.1em', color: 'var(--lab-text-sub, #94a3b8)' }}>
+        <span style={{ fontSize: 11, fontWeight: 800, textTransform: 'uppercase', letterSpacing: '0.1em', color: '#0F0F0F', fontFamily: "'JetBrains Mono', monospace" }}>
           Quantum Evidence
-        </span>
-        <span style={{ fontSize: 10, color: 'var(--lab-text-muted, #475569)' }}>
-          — from actual backend measurement data
         </span>
         {hasAnomaly && (
           <span style={{
             fontSize: 9, fontWeight: 800,
-            background: 'rgba(239,68,68,0.15)',
-            color: '#ef4444',
-            border: '1px solid rgba(239,68,68,0.3)',
-            padding: '1px 7px',
-            borderRadius: 4,
+            background: '#FAF9F5',
+            color: '#DC2626',
+            border: '1.5px solid #0F0F0F',
+            boxShadow: '2px 2px 0px #0F0F0F',
+            padding: '2px 8px',
+            borderRadius: 2,
             textTransform: 'uppercase',
             letterSpacing: '0.07em',
+            fontFamily: "'JetBrains Mono', monospace",
           }}>Anomaly Detected</span>
         )}
       </div>
@@ -144,7 +137,7 @@ export default function EvidenceStrip({
       <div className="evidence-strip">
         {items.map(item => (
           <div key={item.label} className="evidence-cell">
-            <div style={{ fontSize: 9, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.08em', color: '#475569', marginBottom: 2 }}>
+            <div style={{ fontSize: 9, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.08em', color: '#0F0F0F', marginBottom: 2 }}>
               {item.label}
             </div>
             <div style={{ display: 'flex', alignItems: 'baseline', gap: 6 }}>
@@ -152,45 +145,20 @@ export default function EvidenceStrip({
                 fontSize: 18,
                 fontWeight: 800,
                 fontFamily: "'JetBrains Mono', monospace",
-                color: statusColor(item.ok),
+                color: item.ok === false ? '#DC2626' : item.ok === true ? '#1D4ED8' : '#0F0F0F',
                 lineHeight: 1,
               }}>
                 {item.value}
               </span>
-              <span style={{ fontSize: 14, color: statusColor(item.ok), fontWeight: 700 }}>
+              <span style={{ fontSize: 14, color: item.ok === false ? '#DC2626' : item.ok === true ? '#1D4ED8' : '#0F0F0F', fontWeight: 700 }}>
                 {statusIcon(item.ok)}
               </span>
             </div>
             {item.threshold && (
-              <div style={{ fontSize: 9, color: '#475569', marginTop: 2 }}>{item.threshold}</div>
+              <div style={{ fontSize: 9, color: '#555555', marginTop: 2 }}>{item.threshold}</div>
             )}
           </div>
         ))}
-      </div>
-
-      {/* Formal protocol decision indicator */}
-      {verification && (
-        <div style={{
-          marginTop: 6,
-          padding: '6px 12px',
-          background: verification.decision === 'ACCEPT' ? 'rgba(16,185,129,0.08)' : 'rgba(239,68,68,0.08)',
-          border: `1px solid ${verification.decision === 'ACCEPT' ? 'rgba(16,185,129,0.2)' : 'rgba(239,68,68,0.2)'}`,
-          borderRadius: 6,
-          fontSize: 10,
-          color: '#64748b',
-          display: 'flex',
-          alignItems: 'center',
-          gap: 8,
-        }}>
-          <span style={{ fontWeight: 800, color: verification.decision === 'ACCEPT' ? '#10b981' : '#ef4444' }}>
-            {verification.decision === 'ACCEPT' ? '✓ ACCEPTED' : '✗ REJECTED'}
-          </span>
-          <span>by formal deterministic protocol verification — quantum evidence is supporting data only</span>
-        </div>
-      )}
-
-      <div style={{ fontSize: 9, color: '#374151', marginTop: 4, paddingLeft: 2 }}>
-        ¹ QBER Proxy: channel manipulation detector — 0% = clean, 50% = noise injected. Not a formal BB84 QBER.
       </div>
     </div>
   );

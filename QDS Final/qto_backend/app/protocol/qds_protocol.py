@@ -22,8 +22,11 @@ try:
     from app.quantum import angles_from_bit, teleportation, apply_attack, fidelity_pure
     from app.audit import AuditChain, build_protocol_audit_event
 except (ImportError, ValueError):
+    # pyrefly: ignore [missing-import]
     from ..crypto import new_nonce, new_session_id, sha256_bytes, signing_material, bits_from_bytes
+    # pyrefly: ignore [missing-import]
     from ..quantum import angles_from_bit, teleportation, apply_attack, fidelity_pure
+    # pyrefly: ignore [missing-import]
     from ..audit import AuditChain, build_protocol_audit_event
 
 @dataclass
@@ -140,7 +143,7 @@ class QDSProtocolModel:
         qubit_teleportations = []
         received_states = []
 
-        for idx, bit in enumerate(tampered_bits):
+        for idx, bit in enumerate(sig_bits):
             theta, phi = angles_from_bit(bit)
             
             # Quantum teleportation through Bell EPR pair + Pauli correction

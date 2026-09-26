@@ -1,22 +1,16 @@
 import { useEffect, useState } from 'react';
 import { useNavigate, NavLink } from 'react-router-dom';
 import { api } from '../services/api';
-import ThemeToggle from './ThemeToggle';
-import type { Theme } from './ThemeToggle';
 
 type BackendStatus = 'checking' | 'connected' | 'unavailable';
 
 interface HeaderProps {
-  theme?: Theme;
-  onToggleTheme?: () => void;
   onOpenHowItWorks?: () => void;
   onToggleConfig?: () => void;
   showConfig?: boolean;
 }
 
 export default function Header({
-  theme = 'light',
-  onToggleTheme,
   onOpenHowItWorks,
   onToggleConfig,
   showConfig = false,
@@ -37,23 +31,21 @@ export default function Header({
   useEffect(() => { check(); }, []);
 
   const navTabs = [
-    { label: 'EXPERIMENT', path: '/simulator', end: true, icon: '🧪' },
-    { label: 'ANALYSIS', path: '/simulator/analysis', end: false, icon: '🔍' },
-    { label: 'QUANTUM DATA', path: '/simulator/quantum', end: false, icon: '⚛' },
-    { label: 'RESEARCH', path: '/simulator/research', end: false, icon: '📊' },
+    { label: 'EXPERIMENT', path: '/simulator', end: true },
+    { label: 'ANALYSIS', path: '/simulator/analysis', end: false },
+    { label: 'QUANTUM DATA', path: '/simulator/quantum', end: false },
+    { label: 'RESEARCH', path: '/simulator/research', end: false },
   ];
 
   return (
     <header style={{
-      background: 'var(--lab-surface)',
-      backdropFilter: 'blur(20px)',
-      WebkitBackdropFilter: 'blur(20px)',
-      borderBottom: '1px solid var(--lab-border)',
-      boxShadow: '0 4px 20px rgba(0,0,0,0.06)',
+      background: '#FAF9F5',
+      borderBottom: '2px solid #0F0F0F',
+      boxShadow: '0 2px 0px #0F0F0F',
       position: 'sticky',
       top: 0,
       zIndex: 100,
-      transition: 'all 0.2s ease',
+      transition: 'all 0.15s ease',
     }}>
       <div className="container" style={{ maxWidth: 1280 }}>
         <div style={{
@@ -69,30 +61,39 @@ export default function Header({
             <button
               onClick={() => navigate('/')}
               style={{
-                background: 'rgba(31, 182, 214, 0.1)',
-                border: '1px solid var(--lab-border)',
-                borderRadius: 100,
-                padding: '5px 14px',
-                fontSize: 12,
-                fontWeight: 600,
-                color: 'var(--lab-text)',
+                background: '#FAF9F5',
+                border: '1.5px solid #0F0F0F',
+                boxShadow: '2px 2px 0px #0F0F0F',
+                borderRadius: 2,
+                padding: '5px 12px',
+                fontSize: 11,
+                fontWeight: 800,
+                fontFamily: "'JetBrains Mono', monospace",
+                color: '#0F0F0F',
                 cursor: 'pointer',
                 display: 'flex',
                 alignItems: 'center',
                 gap: 6,
-                transition: 'all 0.2s ease',
+                transition: 'all 0.15s ease',
                 whiteSpace: 'nowrap',
               }}
               title="Return to 3D Landing Page"
             >
-              ← Back to Home
+              ← HOME
             </button>
 
-            <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-              <span className="font-display font-semibold text-base tracking-wide whitespace-nowrap">
-                QUANTUM<span style={{ color: '#cc0000' }}>·</span>NET
-              </span>
-            </div>
+            <span style={{
+              fontFamily: "'Space Grotesk', sans-serif",
+              fontWeight: 900,
+              fontSize: 17,
+              letterSpacing: '-0.02em',
+              color: '#0F0F0F',
+              whiteSpace: 'nowrap',
+              display: 'flex',
+              alignItems: 'center',
+            }}>
+              Quantum<span style={{ color: '#DC2626' }}>Shield</span>
+            </span>
           </div>
 
           {/* Center: Lab Navigation Tabs */}
@@ -100,10 +101,11 @@ export default function Header({
             display: 'flex',
             alignItems: 'center',
             gap: 6,
-            background: 'var(--lab-surface-2)',
-            border: '1px solid var(--lab-border)',
+            background: '#FAF9F5',
+            border: '2px solid #0F0F0F',
             padding: '4px 6px',
-            borderRadius: 100,
+            borderRadius: 2,
+            boxShadow: '2px 2px 0px #0F0F0F',
           }}>
             {navTabs.map(tab => (
               <NavLink
@@ -114,44 +116,44 @@ export default function Header({
                 style={({ isActive }) => ({
                   display: 'inline-flex',
                   alignItems: 'center',
-                  gap: 6,
                   padding: '6px 14px',
-                  borderRadius: 100,
+                  borderRadius: 2,
                   fontSize: 11,
                   fontWeight: 800,
+                  fontFamily: "'JetBrains Mono', monospace",
                   letterSpacing: '0.06em',
                   textDecoration: 'none',
-                  transition: 'all 0.2s ease',
-                  color: isActive ? '#ffffff' : 'var(--lab-text-sub)',
-                  background: isActive
-                    ? 'linear-gradient(135deg, #cc0000 0%, #8a0000 100%)'
-                    : 'transparent',
-                  boxShadow: isActive ? '0 2px 10px rgba(204, 0, 0, 0.3)' : 'none',
+                  transition: 'all 0.15s ease',
+                  color: isActive ? '#FFFFFF' : '#0F0F0F',
+                  background: isActive ? '#DC2626' : 'transparent',
+                  border: isActive ? '1.5px solid #0F0F0F' : '1.5px solid transparent',
+                  boxShadow: isActive ? '2px 2px 0px #0F0F0F' : 'none',
                 })}
               >
-                <span style={{ fontSize: 12 }}>{tab.icon}</span>
                 <span>{tab.label}</span>
               </NavLink>
             ))}
           </nav>
 
-          {/* Right: Actions + Backend Status + Theme Toggle */}
+          {/* Right: Actions + Theme Toggle */}
           <div style={{ display: 'flex', alignItems: 'center', gap: 12, flexWrap: 'wrap' }}>
             {onOpenHowItWorks && (
               <button
                 onClick={onOpenHowItWorks}
                 style={{
-                  background: 'rgba(204, 0, 0, 0.08)',
-                  border: '1px solid rgba(204, 0, 0, 0.3)',
-                  color: '#cc0000',
+                  background: '#FAF9F5',
+                  border: '1.5px solid #0F0F0F',
+                  boxShadow: '2px 2px 0px #0F0F0F',
+                  color: '#DC2626',
                   padding: '6px 14px',
-                  borderRadius: 100,
-                  fontSize: 12,
-                  fontWeight: 700,
+                  borderRadius: 2,
+                  fontSize: 11,
+                  fontWeight: 800,
+                  fontFamily: "'JetBrains Mono', monospace",
                   cursor: 'pointer',
                   transition: 'all 0.15s ease',
                 }}
-              >📖 How It Works</button>
+              >HOW IT WORKS</button>
             )}
 
             {onToggleConfig && (
@@ -170,21 +172,6 @@ export default function Header({
                 }}
               >{showConfig ? '▲ Config' : '⚙ Config'}</button>
             )}
-
-            {status === 'checking' && (
-              <span className="pill pill-blue"><span className="dot dot-pulse" />Connecting…</span>
-            )}
-            {status === 'connected' && (
-              <span className="pill pill-green" style={{
-                background: 'rgba(16, 185, 129, 0.12)',
-                border: '1px solid rgba(16, 185, 129, 0.3)',
-                color: '#10b981',
-                borderRadius: 100,
-                padding: '4px 12px',
-                fontSize: 12,
-                fontWeight: 600,
-              }}><span className="dot" style={{ background: '#10b981' }} />Backend Connected</span>
-            )}
             {status === 'unavailable' && (
               <>
                 <span className="pill pill-red"><span className="dot" />Unavailable</span>
@@ -192,10 +179,6 @@ export default function Header({
                   Retry
                 </button>
               </>
-            )}
-
-            {onToggleTheme && (
-              <ThemeToggle theme={theme} onToggle={onToggleTheme} />
             )}
           </div>
         </div>

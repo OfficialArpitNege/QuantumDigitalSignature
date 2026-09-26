@@ -1,3 +1,4 @@
+import { useNavigate } from 'react-router-dom';
 import type { ExtendedAttackType } from './ScenarioSelector';
 import { SCENARIOS } from './ScenarioSelector';
 
@@ -15,18 +16,18 @@ const STAGE_LABELS = [
   'Initiating quantum teleportation over fiber-optic Bell pair channel…',
   'Evaluating quantum state fidelity & statistical divergence…',
   'Running deterministic verification gates (Sig, ID, Replay, Quantum)…',
-  'Bob verifying received quantum state & decision consensus…',
+  'Receiver verifying received quantum state & decision consensus…',
 ];
 
 const ATTACK_DETECTION_LABEL: Partial<Record<ExtendedAttackType, string>> = {
-  forgery: '⚠ ANOMALY DETECTED — HMAC signature tampering detected',
-  replay: '⚠ ANOMALY DETECTED — Replayed session nonce detected',
-  channel_manipulation: '⚠ ANOMALY DETECTED — Entangled state perturbed by channel noise',
-  impersonation: '⚠ ANOMALY DETECTED — Sender identity spoofing attempt intercepted',
-  unauthorized_verification: '⚠ ANOMALY DETECTED — Unauthorized verification key attempt detected',
+  forgery: 'ANOMALY DETECTED — HMAC signature tampering detected',
+  replay: 'ANOMALY DETECTED — Replayed session nonce detected',
+  channel_manipulation: 'ANOMALY DETECTED — Entangled state perturbed by channel noise',
+  impersonation: 'ANOMALY DETECTED — Sender identity spoofing attempt intercepted',
 };
 
 export default function ProtocolNetwork({ attackType, stepIndex, isRunning, isDone, verdict }: Props) {
+  const navigate = useNavigate();
   const scenario = SCENARIOS.find(s => s.id === attackType) ?? SCENARIOS[0];
   const isAttackConfigured = attackType !== 'none';
 
@@ -42,12 +43,12 @@ export default function ProtocolNetwork({ attackType, stepIndex, isRunning, isDo
       : STAGE_LABELS[stepIndex];
   } else if (isDone && verdict) {
     channelLabel = verdict === 'ACCEPT'
-      ? '✓ Protocol Verification Passed — ACCEPTED'
-      : (ATTACK_DETECTION_LABEL[attackType] || '✕ Protocol Verification Failed — REJECTED');
+      ? 'Protocol Verification Passed — ACCEPTED'
+      : (ATTACK_DETECTION_LABEL[attackType] || 'Protocol Verification Failed — REJECTED');
   } else if (!isRunning && !isDone) {
     channelLabel = isAttackConfigured
-      ? `Quantum Laboratory Console Ready — Configured Scenario: ${scenario.label}`
-      : 'Quantum Laboratory Console Ready — Standard Protocol Simulation';
+      ? `Scenario Configured: ${scenario.label}`
+      : 'Protocol Simulation';
   }
 
   const aliceActive = isRunning && (stepIndex === 0 || stepIndex === 1 || stepIndex === 2);
@@ -86,7 +87,7 @@ export default function ProtocolNetwork({ attackType, stepIndex, isRunning, isDo
           transition: 'background 0.4s ease, border-color 0.4s ease',
         }}
       >
-        <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 10, flexWrap: 'wrap' }}>
           <div style={{
             width: 8, height: 8, borderRadius: '50%',
             background: isRunning ? '#f59e0b' : isDone ? (verdict === 'ACCEPT' ? '#10b981' : '#ef4444') : '#1fb6d6',
@@ -98,38 +99,61 @@ export default function ProtocolNetwork({ attackType, stepIndex, isRunning, isDo
             fontSize: 12.5,
             fontFamily: "'JetBrains Mono', monospace",
             color: isThreatDetected
-              ? '#fca5a5'
+              ? '#991B1B'
               : isDone && verdict === 'ACCEPT'
-              ? '#6ee7b7'
-              : 'var(--status-text-color, #38bdf8)',
-            fontWeight: 700,
+              ? '#065F46'
+              : '#0F0F0F',
+            fontWeight: 800,
             transition: 'color 0.4s ease',
           }}>
             {channelLabel}
           </span>
+
+          {isDone && (
+            <button
+              onClick={() => navigate('/simulator/analysis')}
+              style={{
+                background: '#1D4ED8',
+                color: '#FFFFFF',
+                border: '1.5px solid #0F0F0F',
+                boxShadow: '2px 2px 0px #0F0F0F',
+                borderRadius: 2,
+                padding: '4px 12px',
+                fontSize: 11,
+                fontWeight: 800,
+                fontFamily: "'JetBrains Mono', monospace",
+                cursor: 'pointer',
+                marginLeft: 8,
+                transition: 'all 0.15s ease',
+                whiteSpace: 'nowrap',
+              }}
+            >
+              VIEW ANALYSIS →
+            </button>
+          )}
         </div>
 
-        {/* Top Badge: Neutral before detection, Threat Red only AFTER actual detection! */}
+        {/* Top Badge: Neutral before completion, Threat Red ONLY AFTER process is complete and REJECT decision given */}
         <div style={{
           fontSize: 10,
           fontWeight: 800,
           padding: '4px 12px',
           borderRadius: 100,
-          background: isThreatDetected
-            ? 'rgba(239, 68, 68, 0.15)'
+          background: (isDone && verdict === 'REJECT')
+            ? '#FEE2E2'
             : 'rgba(31, 182, 214, 0.12)',
-          border: `1px solid ${isThreatDetected ? 'rgba(239, 68, 68, 0.4)' : 'rgba(31, 182, 214, 0.3)'}`,
-          color: isThreatDetected ? '#ef4444' : '#1fb6d6',
+          border: `1.5px solid ${(isDone && verdict === 'REJECT') ? '#991B1B' : 'rgba(31, 182, 214, 0.4)'}`,
+          color: (isDone && verdict === 'REJECT') ? '#991B1B' : '#0F0F0F',
           textTransform: 'uppercase',
           letterSpacing: '0.08em',
           whiteSpace: 'nowrap',
           transition: 'all 0.4s ease',
         }}>
-          {isThreatDetected
-            ? `⚠ THREAT DETECTED: ${scenario.label}`
+          {(isDone && verdict === 'REJECT')
+            ? `THREAT DETECTED: ${scenario.label}`
             : isAttackConfigured
             ? `SCENARIO CONFIG: ${scenario.label}`
-            : '✓ LEGITIMATE PROTOCOL'
+            : 'NO ATTACK'
           }
         </div>
       </div>
@@ -137,17 +161,17 @@ export default function ProtocolNetwork({ attackType, stepIndex, isRunning, isDo
       {/* Main Quantum Channel Network Row */}
       <div style={{
         display: 'flex',
-        alignItems: 'center',
-        padding: '36px 40px',
+        alignItems: 'flex-start',
+        padding: '36px 40px 60px 40px',
         gap: 0,
         position: 'relative',
         zIndex: 1,
-        minHeight: 200,
+        minHeight: 240,
       }}>
 
-        {/* ── ALICE NODE ── */}
+        {/* ── SENDER NODE ── */}
         <ActorNode
-          label="ALICE"
+          label="SENDER"
           role="Legitimate Sender"
           icon="👩‍💻"
           color="#1fb6d6"
@@ -156,36 +180,18 @@ export default function ProtocolNetwork({ attackType, stepIndex, isRunning, isDo
           verdict={isDone ? verdict : undefined}
         />
 
-        {/* ── CINEMATIC FIBER-OPTIC QUANTUM CHANNEL TRACK ── */}
-        <div style={{ flex: 1, position: 'relative', height: 90, minWidth: 0, display: 'flex', alignItems: 'center' }}>
+        {/* ── CLEAN QUANTUM CHANNEL TRACK ── */}
+        <div style={{ flex: 1, position: 'relative', height: 76, minWidth: 0, display: 'flex', alignItems: 'center' }}>
 
-          {/* Outer Ambient Fiber Duct Glow */}
+          {/* Clean Core Line (No messy gradients/glows) */}
           <div style={{
             position: 'absolute',
             left: 0, right: 0,
-            height: 10,
-            borderRadius: 999,
-            background: isThreatDetected
-              ? 'linear-gradient(90deg, rgba(31,182,214,0.3), rgba(239,68,68,0.6) 50%, rgba(124,108,246,0.3))'
-              : 'linear-gradient(90deg, rgba(31,182,214,0.3), rgba(56,189,248,0.6) 50%, rgba(16,185,129,0.3))',
-            filter: 'blur(6px)',
-            opacity: isRunning && (stepIndex === 2 || stepIndex === 3) ? 0.9 : 0.4,
-            transition: 'all 0.5s ease',
-          }} />
-
-          {/* Inner Core Fiber Guide Line — Stays clean cyan/blue during transmission! */}
-          <div style={{
-            position: 'absolute',
-            left: 0, right: 0,
-            height: 3,
-            borderRadius: 999,
-            background: isThreatDetected
-              ? 'linear-gradient(90deg, #1fb6d6, #ef4444, #7c6cf6)'
-              : 'linear-gradient(90deg, #1fb6d6, #38bdf8 50%, #10b981)',
-            boxShadow: isThreatDetected
-              ? '0 0 14px #ef4444, 0 0 28px rgba(239, 68, 68, 0.5)'
-              : '0 0 14px #1fb6d6, 0 0 28px rgba(31, 182, 214, 0.5)',
-            transition: 'all 0.5s ease',
+            top: 38,
+            height: 2,
+            transform: 'translateY(-50%)',
+            background: isThreatDetected ? '#DC2626' : '#1D4ED8',
+            transition: 'all 0.3s ease',
           }} />
 
           {/* CINEMATIC ENERGY PULSE & SOFT AMBIENT TRAIL (Alice -> Bob) */}
@@ -212,43 +218,41 @@ export default function ProtocolNetwork({ attackType, stepIndex, isRunning, isDo
                 {/* Trailing ambient energy glow stream */}
                 <div style={{
                   width: 140,
-                  height: 6,
-                  borderRadius: 100,
-                  background: `linear-gradient(90deg, transparent, ${pulseColor}66 50%, ${pulseColor} 100%)`,
-                  filter: 'blur(1px)',
-                  boxShadow: `0 0 12px ${pulseColor}`,
+                  height: 4,
+                  borderRadius: 2,
+                  background: `linear-gradient(90deg, transparent, ${pulseColor} 100%)`,
                 }} />
 
                 {/* Bright Energy Core Node */}
                 <div style={{
-                  width: 14,
-                  height: 14,
+                  width: 12,
+                  height: 12,
                   borderRadius: '50%',
-                  background: '#ffffff',
-                  boxShadow: `0 0 12px #ffffff, 0 0 24px ${pulseColor}, 0 0 36px ${pulseColor}`,
-                  marginLeft: -7,
+                  background: '#0F0F0F',
+                  border: `2px solid ${pulseColor}`,
+                  marginLeft: -6,
                   display: 'flex',
                   alignItems: 'center',
                   justifyContent: 'center',
                   position: 'relative',
                 }}>
-                  <span style={{ fontSize: 7, color: '#0b1220', fontWeight: 900 }}>⚛</span>
+                  <span style={{ fontSize: 7, color: '#FAF9F5', fontWeight: 900 }}>⚛</span>
                 </div>
 
                 {/* Floating Qubit Symbol Chip */}
                 <div style={{
                   position: 'absolute',
-                  top: -20,
+                  top: -24,
                   left: 60,
                   fontSize: 10,
-                  fontWeight: 900,
+                  fontWeight: 800,
                   fontFamily: "'JetBrains Mono', monospace",
-                  color: pulseColor,
-                  background: 'var(--lab-bg)',
-                  border: `1px solid ${pulseColor}66`,
-                  padding: '1px 7px',
-                  borderRadius: 100,
-                  boxShadow: `0 2px 8px ${pulseColor}44`,
+                  color: '#0F0F0F',
+                  background: '#FAF9F5',
+                  border: '1.5px solid #0F0F0F',
+                  boxShadow: '2px 2px 0px #0F0F0F',
+                  padding: '2px 8px',
+                  borderRadius: 2,
                   whiteSpace: 'nowrap',
                 }}>
                   |ψ⟩ payload
@@ -257,81 +261,63 @@ export default function ProtocolNetwork({ attackType, stepIndex, isRunning, isDo
             </div>
           )}
 
-          {/* ANALYZE STAGE: Scanning laser sweep effect */}
-          {isRunning && stepIndex === 3 && (
-            <div style={{
-              position: 'absolute',
-              top: '-20%',
-              bottom: '-20%',
-              width: 4,
-              background: isThreatDetected ? '#ef4444' : '#1fb6d6',
-              boxShadow: isThreatDetected ? '0 0 20px #ef4444, 0 0 40px #ef4444' : '0 0 20px #1fb6d6, 0 0 40px #1fb6d6',
-              animation: 'qds-flow 2.2s ease-in-out infinite alternate',
-              zIndex: 5,
-              borderRadius: 2,
-            }} />
-          )}
-
           {/* Bell Pair formula tag */}
           <div
             className="bell-pair-tag"
             style={{
               position: 'absolute',
-              top: -24,
+              top: -28,
               left: '50%',
               transform: 'translateX(-50%)',
               fontSize: 11,
               fontFamily: "'JetBrains Mono', monospace",
-              color: 'var(--bell-text, #38bdf8)',
-              background: 'var(--bell-bg, rgba(8, 14, 26, 0.9))',
+              color: '#0F0F0F',
+              background: '#FAF9F5',
               padding: '4px 16px',
-              borderRadius: 100,
+              borderRadius: 2,
               whiteSpace: 'nowrap',
-              border: '1px solid var(--bell-bd, rgba(31, 182, 214, 0.3))',
-              boxShadow: '0 4px 14px rgba(0,0,0,0.2)',
+              border: '1.5px solid #0F0F0F',
+              boxShadow: '2px 2px 0px #0F0F0F',
               fontWeight: 700,
             }}
           >
             |Φ+⟩ = (|00⟩ + |11⟩) / √2
           </div>
 
-          {/* EVE Threat Node & Optical Tap Line (Stays subtle until actual detection!) */}
+          {/* EVE Threat Node & Tap Line (Clean spacing below channel) */}
           {isAttackConfigured && (
             <div style={{
               position: 'absolute',
-              bottom: -74,
+              top: 38,
               left: '50%',
               transform: 'translateX(-50%)',
               display: 'flex',
               flexDirection: 'column',
               alignItems: 'center',
-              gap: 4,
+              gap: 0,
               zIndex: 5,
-              transition: 'all 0.4s ease',
-              opacity: eveActive ? 1 : 0.35,
+              transition: 'all 0.3s ease',
+              opacity: eveActive ? 1 : 0.5,
             }}>
-              {/* Optical tap line */}
+              {/* Tap line */}
               <div style={{
-                width: 2, height: 22,
-                background: isThreatDetected ? '#ef4444' : '#475569',
-                borderLeft: isThreatDetected ? '2px dashed #ef4444' : '2px dashed #475569',
-                boxShadow: isThreatDetected ? '0 0 8px #ef4444' : 'none',
+                width: 2, height: 18,
+                background: isThreatDetected ? '#DC2626' : '#0F0F0F',
               }} />
               <div style={{
-                background: isThreatDetected ? 'rgba(69, 10, 10, 0.95)' : 'var(--card-bg, rgba(26, 16, 20, 0.9))',
-                border: `1.5px solid ${isThreatDetected ? '#ef4444' : 'var(--card-border, #475569)'}`,
-                borderRadius: 12,
-                padding: '8px 18px',
+                background: '#0F0F0F',
+                border: '2px solid #0F0F0F',
+                borderRadius: 2,
+                padding: '8px 16px',
                 textAlign: 'center',
-                animation: isThreatDetected ? 'qds-eve-pulse 1s ease-in-out infinite' : 'none',
                 minWidth: 170,
-                boxShadow: isThreatDetected ? '0 0 24px rgba(239, 68, 68, 0.5)' : 'none',
+                boxShadow: '3px 3px 0px #DC2626',
               }}>
-                <div style={{ fontSize: 18, marginBottom: 2 }}>🕵️‍♀️</div>
-                <div style={{ fontSize: 11, fontWeight: 900, color: isThreatDetected ? '#fca5a5' : 'var(--card-text, #9ca3af)', letterSpacing: '0.08em' }}>
-                  EVE (INTERCEPTOR)
+                <div style={{ fontSize: 16, marginBottom: 2 }}>🕵️‍♀️</div>
+                <div style={{ fontSize: 11, fontWeight: 900, color: '#FAF9F5', letterSpacing: '0.08em', fontFamily: "'JetBrains Mono', monospace" }}>
+                  ATTACKER (INTERCEPTOR)
                 </div>
-                <div style={{ fontSize: 9.5, color: isThreatDetected ? '#fca5a5' : 'var(--card-text-sub, #6b7280)' }}>
+                <div style={{ fontSize: 10, color: '#FCA5A5', fontFamily: "'JetBrains Mono', monospace", fontWeight: 700 }}>
                   {isThreatDetected ? `⚠ ${scenario.eveRole}` : scenario.eveRole}
                 </div>
               </div>
@@ -339,55 +325,17 @@ export default function ProtocolNetwork({ attackType, stepIndex, isRunning, isDo
           )}
         </div>
 
-        {/* ── BOB NODE ── */}
+        {/* ── RECEIVER NODE ── */}
         <ActorNode
-          label="BOB"
+          label="RECEIVER"
           role="Receiver / Verifier"
           icon="👨‍🔬"
-          color="#10b981"
+          color={isDone ? (verdict === 'REJECT' ? '#DC2626' : '#10b981') : (isRunning ? '#EAB308' : '#10b981')}
           isActive={bobActive || isDone}
           badge={isRunning && stepIndex >= 4 ? (stepIndex === 4 ? 'DECIDING' : 'VERIFYING') : undefined}
           verdict={isDone ? verdict : undefined}
           verdictColor={isDone ? verdictColor : undefined}
         />
-      </div>
-
-      {/* Pipeline progress bar indicator */}
-      <div
-        className="pipeline-bar-container"
-        style={{
-          borderTop: '1px solid var(--lab-border, rgba(31, 182, 214, 0.15))',
-          padding: '10px 24px',
-          display: 'flex',
-          gap: 6,
-          background: 'var(--pipeline-bg, rgba(8, 14, 26, 0.65))',
-          position: 'relative',
-          zIndex: 2,
-        }}
-      >
-        {STAGE_LABELS.map((label, idx) => {
-          const done = isDone || (isRunning && idx < stepIndex);
-          const active = isRunning && idx === stepIndex;
-          const isFailedStep = isThreatDetected && idx >= 3;
-          return (
-            <div
-              key={idx}
-              style={{
-                flex: 1,
-                height: 5,
-                borderRadius: 3,
-                background: done
-                  ? (isFailedStep ? '#ef4444' : '#10b981')
-                  : active
-                    ? (isThreatDetected ? '#ef4444' : '#1fb6d6')
-                    : 'var(--segment-inactive-bg, rgba(71, 85, 105, 0.3))',
-                boxShadow: active ? `0 0 12px ${isThreatDetected ? '#ef4444' : '#1fb6d6'}` : 'none',
-                transition: 'all 0.3s ease',
-              }}
-              title={label}
-            />
-          );
-        })}
       </div>
     </div>
   );
@@ -418,14 +366,22 @@ function ActorNode({ label, role, icon, color, isActive, badge, verdict, verdict
       <div style={{
         width: 76, height: 76,
         borderRadius: '50%',
-        background: isActive ? `rgba(${color === '#1fb6d6' ? '31,182,214' : '16,185,129'},0.15)` : 'var(--actor-circle-bg, rgba(30, 41, 59, 0.6))',
-        border: `2px solid ${isActive ? color : 'var(--actor-circle-bd, rgba(71, 85, 105, 0.4))'}`,
+        background: color === '#DC2626'
+          ? '#FCA5A5'
+          : color === '#EAB308'
+          ? '#FEF08A'
+          : (isActive ? `rgba(${color === '#1fb6d6' ? '31,182,214' : '16,185,129'},0.15)` : 'var(--actor-circle-bg, rgba(30, 41, 59, 0.6))'),
+        border: (color === '#DC2626' || color === '#EAB308')
+          ? '2px solid #0F0F0F'
+          : `2px solid ${isActive ? color : 'var(--actor-circle-bd, rgba(71, 85, 105, 0.4))'}`,
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'center',
         fontSize: 30,
         transition: 'all 0.3s ease',
-        boxShadow: isActive ? `0 0 24px ${color}50` : 'none',
+        boxShadow: (color === '#DC2626' || color === '#EAB308')
+          ? '3px 3px 0px #0F0F0F'
+          : (isActive ? `0 0 24px ${color}50` : 'none'),
         position: 'relative',
       }}>
         {icon}
@@ -443,12 +399,12 @@ function ActorNode({ label, role, icon, color, isActive, badge, verdict, verdict
       <div style={{ textAlign: 'center' }}>
         <div style={{
           fontSize: 13, fontWeight: 900,
-          color: isActive ? color : 'var(--actor-label-color, #94a3b8)',
+          color: '#0F0F0F',
           letterSpacing: '0.08em',
           textTransform: 'uppercase',
-          transition: 'color 0.3s',
+          fontFamily: "'Space Grotesk', sans-serif",
         }}>{label}</div>
-        <div style={{ fontSize: 10, color: 'var(--lab-text-sub)', marginTop: 1 }}>{role}</div>
+        <div style={{ fontSize: 10, color: '#555555', marginTop: 1, fontWeight: 700, fontFamily: "'JetBrains Mono', monospace" }}>{role}</div>
       </div>
 
       {badge && (

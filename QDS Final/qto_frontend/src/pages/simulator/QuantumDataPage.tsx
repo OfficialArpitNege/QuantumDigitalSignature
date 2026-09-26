@@ -30,18 +30,6 @@ export default function QuantumDataPage() {
     <div style={{ animation: 'qds-appear 0.3s ease' }}>
       {/* Page Header */}
       <div style={{ marginBottom: 24 }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 4 }}>
-          <span className="eyebrow" style={{ color: '#1fb6d6', margin: 0 }}>
-            QUANTUM CHANNEL DATA
-          </span>
-          <span style={{
-            fontSize: 9, fontWeight: 800, textTransform: 'uppercase', letterSpacing: '0.08em',
-            background: 'rgba(31, 182, 214, 0.12)', color: '#1fb6d6',
-            border: '1px solid rgba(31, 182, 214, 0.3)', padding: '2px 8px', borderRadius: 100,
-          }}>
-            State Fidelity: {(avgFidelity * 100).toFixed(2)}%
-          </span>
-        </div>
         <h1 style={{
           fontSize: 'clamp(22px, 2.5vw, 28px)',
           fontWeight: 800,

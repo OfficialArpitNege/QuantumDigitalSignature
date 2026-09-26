@@ -34,10 +34,11 @@ export default function Scene() {
         <Interference pulseRef={evePulseRef} />
         <RejectBurst />
 
-        <CharacterNode position={ALICE_POS} color="#1fb6d6" glowColor="#5fe0f4" />
-        <CharacterNode position={BOB_POS} color="#7c6cf6" glowColor="#a89bff" />
+        <CharacterNode position={ALICE_POS} label="SENDER" color="#1fb6d6" glowColor="#5fe0f4" />
+        <CharacterNode position={BOB_POS} label="RECEIVER" color="#7c6cf6" glowColor="#a89bff" />
         <CharacterNode
           position={EVE_POS}
+          label="ATTACKER"
           color="#ff6b4a"
           glowColor="#ffb020"
           scale={0.85}
