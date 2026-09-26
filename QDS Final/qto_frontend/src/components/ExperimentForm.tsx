@@ -18,7 +18,7 @@ const ATTACK_OPTIONS: { value: AttackType; label: string; icon: string; descript
   { value: 'forgery',            label: 'Forgery',               icon: '✎', description: 'Rotates qubit phase' },
   { value: 'impersonation',      label: 'Impersonation',         icon: '👤', description: 'Replaces quantum identity' },
   { value: 'replay',             label: 'Replay',                icon: '↺', description: 'Duplicate signature reuse' },
-  { value: 'channel_manipulation', label: 'Channel Manip.',      icon: '⚡', description: 'Intercepts the channel' },
+  { value: 'channel_manipulation', label: 'Channel Manip.',      icon: '∿', description: 'Intercepts the channel' },
 ];
 
 export default function ExperimentForm({

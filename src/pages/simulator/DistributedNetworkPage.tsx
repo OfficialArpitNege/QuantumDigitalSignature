@@ -159,7 +159,7 @@ export default function DistributedNetworkPage() {
               margin: 0,
               color: '#0F0F0F',
             }}>
-              3-Device Live Network Session
+              Distributed Multi-Node QDS Protocol
             </h1>
             <span style={{
               background: '#0F0F0F',
@@ -192,7 +192,7 @@ export default function DistributedNetworkPage() {
               transition: 'all 0.15s ease',
             }}
           >
-            {copied ? '✓ COPIED LINK' : '🔗 SHARE URL'}
+            {copied ? 'COPIED LINK' : 'SHARE ENDPOINT URL'}
           </button>
 
           <button
@@ -211,7 +211,7 @@ export default function DistributedNetworkPage() {
               cursor: 'pointer',
             }}
           >
-            RESET DEMO ↺
+            RESET PROTOCOL ↺
           </button>
         </div>
       </div>
@@ -242,10 +242,10 @@ export default function DistributedNetworkPage() {
           }}
         >
           <div style={{ fontSize: 10, fontWeight: 800, letterSpacing: '0.1em', opacity: 0.8, textTransform: 'uppercase', fontFamily: "'JetBrains Mono', monospace" }}>
-            DEVICE 1
+            NODE 01
           </div>
           <div style={{ fontSize: 15, fontWeight: 900, fontFamily: "'Space Grotesk', sans-serif" }}>
-            SENDER (Alice) 🔵
+            SENDER (Alice)
           </div>
         </button>
 
@@ -266,10 +266,10 @@ export default function DistributedNetworkPage() {
           }}
         >
           <div style={{ fontSize: 10, fontWeight: 800, letterSpacing: '0.1em', opacity: 0.8, textTransform: 'uppercase', fontFamily: "'JetBrains Mono', monospace" }}>
-            DEVICE 2
+            NODE 02
           </div>
           <div style={{ fontSize: 15, fontWeight: 900, fontFamily: "'Space Grotesk', sans-serif" }}>
-            ATTACKER (Eve) ⚡
+            ADVERSARY (Eve)
           </div>
         </button>
 
@@ -290,10 +290,10 @@ export default function DistributedNetworkPage() {
           }}
         >
           <div style={{ fontSize: 10, fontWeight: 800, letterSpacing: '0.1em', opacity: 0.8, textTransform: 'uppercase', fontFamily: "'JetBrains Mono', monospace" }}>
-            DEVICE 3
+            NODE 03
           </div>
           <div style={{ fontSize: 15, fontWeight: 900, fontFamily: "'Space Grotesk', sans-serif" }}>
-            RECEIVER (Bob) 🔬
+            RECEIVER (Bob)
           </div>
         </button>
       </div>
@@ -335,7 +335,7 @@ export default function DistributedNetworkPage() {
           </span>
           <span>→</span>
           <span style={{ color: state?.attacker?.status === 'intercepted' ? '#EA580C' : state?.attacker?.status === 'passed' ? '#10B981' : '#888', fontWeight: 800 }}>
-            ② ATTACKER {state?.attacker?.status !== 'idle' && state?.attacker?.status ? '✓' : '...'}
+            ② ADVERSARY {state?.attacker?.status !== 'idle' && state?.attacker?.status ? '✓' : '...'}
           </span>
           <span>→</span>
           <span style={{ color: state?.receiver?.status === 'verified' ? '#7C3AED' : '#888', fontWeight: 800 }}>
@@ -359,13 +359,10 @@ export default function DistributedNetworkPage() {
           borderRadius: 2,
           padding: '28px 32px',
         }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 16 }}>
-            <span style={{ fontSize: 20 }}>🔵</span>
-            <div>
-              <h2 style={{ margin: 0, fontSize: 18, fontWeight: 900, fontFamily: "'Space Grotesk', sans-serif" }}>
-                Sender Terminal (Alice)
-              </h2>
-            </div>
+          <div style={{ marginBottom: 16 }}>
+            <h2 style={{ margin: 0, fontSize: 18, fontWeight: 900, fontFamily: "'Space Grotesk', sans-serif" }}>
+              [NODE 01] Sender Terminal (Alice)
+            </h2>
           </div>
 
           <div style={{ marginBottom: 18 }}>
@@ -460,7 +457,7 @@ export default function DistributedNetworkPage() {
                 transition: 'all 0.15s ease',
               }}
             >
-              {actionLoading ? 'TRANSMITTING...' : 'TRANSMIT QUANTUM SIGNATURE ⚛'}
+              {actionLoading ? 'TRANSMITTING...' : 'TRANSMIT QUANTUM SIGNATURE'}
             </button>
           </div>
 
@@ -482,7 +479,7 @@ export default function DistributedNetworkPage() {
                 <b>HMAC/SHA256 Hash:</b> {state.message_hash}
               </div>
               <div style={{ fontSize: 11, color: '#047857', marginTop: 8 }}>
-                Current Status: <b>{currentStatus}</b>. Device 2 (Attacker) and Device 3 (Receiver) can now act!
+                Current Status: <b>{currentStatus}</b>. Adversary Node (Eve) and Receiver Node (Bob) can now process the quantum transmission.
               </div>
             </div>
           )}
@@ -500,13 +497,10 @@ export default function DistributedNetworkPage() {
           borderRadius: 2,
           padding: '28px 32px',
         }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 16 }}>
-            <span style={{ fontSize: 20 }}>⚡</span>
-            <div>
-              <h2 style={{ margin: 0, fontSize: 18, fontWeight: 900, fontFamily: "'Space Grotesk', sans-serif" }}>
-                Quantum Channel Eavesdropper Terminal (Eve)
-              </h2>
-            </div>
+          <div style={{ marginBottom: 16 }}>
+            <h2 style={{ margin: 0, fontSize: 18, fontWeight: 900, fontFamily: "'Space Grotesk', sans-serif" }}>
+              [NODE 02] Adversary Terminal (Eve)
+            </h2>
           </div>
 
           {currentStatus === 'IDLE' ? (
@@ -518,10 +512,9 @@ export default function DistributedNetworkPage() {
               color: '#666',
               fontFamily: "'JetBrains Mono', monospace",
             }}>
-              <div style={{ fontSize: 24, marginBottom: 8 }}>📡</div>
-              <div style={{ fontWeight: 800 }}>WAITING FOR SENDER (DEVICE 1) TO TRANSMIT...</div>
+              <div style={{ fontWeight: 800 }}>WAITING FOR SENDER TRANSMISSION...</div>
               <div style={{ fontSize: 11, marginTop: 4 }}>
-                Once Device 1 clicks "Transmit Quantum Signature", this terminal will intercept the signal.
+                Once Node 01 (Sender) transmits a quantum signature, the channel adversary node can intercept or pass the state.
               </div>
             </div>
           ) : (
@@ -536,7 +529,7 @@ export default function DistributedNetworkPage() {
                 fontSize: 12,
               }}>
                 <div style={{ fontWeight: 800, color: '#B45309', marginBottom: 4 }}>
-                  🚨 QUANTUM PAYLOAD DETECTED IN CHANNEL!
+                  [CHANNEL STATUS] QUANTUM PAYLOAD DETECTED IN TRANSIT
                 </div>
                 <div><b>Intercepted Payload:</b> "{state?.message}"</div>
                 <div style={{ fontSize: 11, color: '#78350F', marginTop: 4 }}>
@@ -617,7 +610,7 @@ export default function DistributedNetworkPage() {
                     cursor: 'pointer',
                   }}
                 >
-                  {actionLoading ? 'INJECTING...' : '⚡ INJECT ATTACK INTO CHANNEL'}
+                  {actionLoading ? 'INJECTING...' : 'EXECUTE CHANNEL PERTURBATION'}
                 </button>
 
                 <button
@@ -636,7 +629,7 @@ export default function DistributedNetworkPage() {
                     cursor: 'pointer',
                   }}
                 >
-                  ✓ PASS UNTOUCHED (LEGITIMATE CHANNEL)
+                  PASS UNTOUCHED (LEGITIMATE CHANNEL)
                 </button>
               </div>
 
@@ -651,7 +644,7 @@ export default function DistributedNetworkPage() {
                   fontSize: 11.5,
                   color: '#991B1B',
                 }}>
-                  <b>⚡ ATTACK INJECTED:</b> Applied <b>{state.attacker.attack_type}</b> ({((state.attacker.attack_strength || 0) * 100).toFixed(0)}% strength). Forwarded to Device 3 (Receiver).
+                  <b>[CHANNEL PERTURBED]:</b> Applied <b>{state.attacker.attack_type}</b> ({((state.attacker.attack_strength || 0) * 100).toFixed(0)}% strength). Forwarded to Node 03 (Receiver).
                 </div>
               )}
 
@@ -666,7 +659,7 @@ export default function DistributedNetworkPage() {
                   fontSize: 11.5,
                   color: '#065F46',
                 }}>
-                  <b>✓ PASSED INTACT:</b> State forwarded without interference.
+                  <b>[PASSED INTACT]:</b> State forwarded to Node 03 without interference.
                 </div>
               )}
             </div>
@@ -685,13 +678,10 @@ export default function DistributedNetworkPage() {
           borderRadius: 2,
           padding: '28px 32px',
         }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 16 }}>
-            <span style={{ fontSize: 20 }}>🔬</span>
-            <div>
-              <h2 style={{ margin: 0, fontSize: 18, fontWeight: 900, fontFamily: "'Space Grotesk', sans-serif" }}>
-                Receiver &amp; Threat Detection Observatory (Bob)
-              </h2>
-            </div>
+          <div style={{ marginBottom: 16 }}>
+            <h2 style={{ margin: 0, fontSize: 18, fontWeight: 900, fontFamily: "'Space Grotesk', sans-serif" }}>
+              [NODE 03] Receiver Observatory (Bob)
+            </h2>
           </div>
 
           {currentStatus === 'IDLE' ? (
@@ -703,10 +693,9 @@ export default function DistributedNetworkPage() {
               color: '#666',
               fontFamily: "'JetBrains Mono', monospace",
             }}>
-              <div style={{ fontSize: 24, marginBottom: 8 }}>⏳</div>
               <div style={{ fontWeight: 800 }}>WAITING FOR INCOMING TRANSMISSION...</div>
               <div style={{ fontSize: 11, marginTop: 4 }}>
-                Device 1 (Sender) must transmit a quantum signature first.
+                Node 01 (Sender) must transmit a quantum signature payload first.
               </div>
             </div>
           ) : (
@@ -727,9 +716,9 @@ export default function DistributedNetworkPage() {
                 </div>
                 <div style={{ fontSize: 11, color: '#666' }}>
                   Channel Status: {state?.attacker?.status === 'intercepted' ? (
-                    <b style={{ color: '#DC2626' }}>⚠️ Eavesdropping Activity Registered in Channel</b>
+                    <b style={{ color: '#DC2626' }}>[PERTURBATION LOGGED] Channel modified by Adversary</b>
                   ) : state?.attacker?.status === 'passed' ? (
-                    <b style={{ color: '#10B981' }}>✓ Clean Transmission Reported</b>
+                    <b style={{ color: '#10B981' }}>[CLEAN TRANSMISSION] State intact</b>
                   ) : (
                     <span>Awaiting Attacker or Direct Measure</span>
                   )}
@@ -756,7 +745,7 @@ export default function DistributedNetworkPage() {
                     marginBottom: 20,
                   }}
                 >
-                  {actionLoading ? 'EXECUTING PAULI MEASUREMENTS...' : '🔬 MEASURE PAULI EIGENSTATES & VERIFY SIGNATURE'}
+                  {actionLoading ? 'EXECUTING PAULI MEASUREMENTS...' : 'MEASURE PAULI EIGENSTATES & VERIFY'}
                 </button>
               )}
 
@@ -874,7 +863,7 @@ export default function DistributedNetworkPage() {
                       color: '#444',
                     }}>
                       <div style={{ fontWeight: 800, color: '#0F0F0F', marginBottom: 4 }}>
-                        🔒 CRYPTOGRAPHIC TAMPER-EVIDENT AUDIT TRAIL LOGGED:
+                        CRYPTOGRAPHIC TAMPER-EVIDENT AUDIT TRAIL LOGGED:
                       </div>
                       <div><b>Block Hash:</b> {state.receiver.audit_entry.entry_hash || 'SHA-256 SEALED'}</div>
                       <div><b>Timestamp:</b> {state.receiver.audit_entry.timestamp || new Date().toISOString()}</div>

@@ -32,7 +32,7 @@ export default function Header({
 
   const navTabs = [
     { label: 'EXPERIMENT', path: '/simulator', end: true },
-    { label: '3-DEVICE DEMO ⚡', path: '/simulator/network', end: false },
+    { label: 'DISTRIBUTED NETWORK', path: '/simulator/network', end: false },
     { label: 'ANALYSIS', path: '/simulator/analysis', end: false },
     { label: 'QUANTUM DATA', path: '/simulator/quantum', end: false },
     { label: 'RESEARCH', path: '/simulator/research', end: false },

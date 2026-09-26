@@ -18,7 +18,7 @@ export const SCENARIOS: ScenarioDef[] = [
   { id: 'none',                    icon: '✓', label: 'NO ATTACK',         short: 'Clean transmission',          color: '#10b981', eveRole: '' },
   { id: 'forgery',                 icon: '✎', label: 'FORGERY',           short: 'Signature tampered',          color: '#0284c7', eveRole: 'Signature Tampering' },
   { id: 'replay',                  icon: '↩', label: 'REPLAY',            short: 'Old session replayed',        color: '#7c6cf6', eveRole: 'Session Replay' },
-  { id: 'channel_manipulation',    icon: '⚡', label: 'CHANNEL NOISE',     short: 'Quantum channel perturbed',   color: '#06b6d4', eveRole: 'Quantum Channel Noise' },
+  { id: 'channel_manipulation',    icon: '∿', label: 'CHANNEL NOISE',     short: 'Quantum channel perturbed',   color: '#06b6d4', eveRole: 'Quantum Channel Noise' },
   { id: 'impersonation',           icon: '👤', label: 'IMPERSONATION',     short: 'Identity spoofing',           color: '#8b5cf6', eveRole: 'Identity Spoofing' },
 ];
 

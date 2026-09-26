@@ -78,29 +78,38 @@ export default function ExperimentPage() {
         </div>
       </div>
 
-      {/* Multi-Device Hackathon Banner */}
+      {/* Distributed Multi-Node Architecture Banner */}
       <div style={{
-        background: '#EFF6FF',
-        border: '1.5px solid #1D4ED8',
-        boxShadow: '2.5px 2.5px 0px #1D4ED8',
+        background: '#FAF9F5',
+        border: '1.5px solid #0F0F0F',
+        boxShadow: '2px 2px 0px #0F0F0F',
         borderRadius: 2,
-        padding: '12px 20px',
+        padding: '14px 22px',
         marginBottom: 20,
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'space-between',
         flexWrap: 'wrap',
-        gap: 12,
+        gap: 14,
       }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-          <span style={{ fontSize: 18 }}>⚡</span>
-          <div>
-            <div style={{ fontFamily: "'Space Grotesk', sans-serif", fontWeight: 900, fontSize: 13, color: '#1E40AF' }}>
-              DISTRIBUTED 3-DEVICE HACKATHON MODE AVAILABLE
-            </div>
-            <div style={{ fontFamily: "'JetBrains Mono', monospace", fontSize: 11, color: '#1E3A8A', marginTop: 2 }}>
-              Control Sender on Phone 1, Attacker on Phone 2, and Receiver on Laptop over local Wi-Fi.
-            </div>
+        <div>
+          <div style={{
+            fontFamily: "'Space Grotesk', sans-serif",
+            fontWeight: 800,
+            fontSize: 13,
+            color: '#0F0F0F',
+            textTransform: 'uppercase',
+            letterSpacing: '0.04em',
+          }}>
+            DISTRIBUTED MULTI-NODE VERIFICATION ARCHITECTURE
+          </div>
+          <div style={{
+            fontFamily: "'JetBrains Mono', monospace",
+            fontSize: 11,
+            color: '#555555',
+            marginTop: 3,
+          }}>
+            Tripartite protocol execution: Sender preparation, Quantum channel adversary, and Receiver measurement nodes across network endpoints.
           </div>
         </div>
         <button
@@ -111,15 +120,17 @@ export default function ExperimentPage() {
             border: '1.5px solid #0F0F0F',
             boxShadow: '2px 2px 0px #0F0F0F',
             borderRadius: 2,
-            padding: '8px 16px',
+            padding: '8px 18px',
             fontSize: 11,
             fontWeight: 800,
             fontFamily: "'JetBrains Mono', monospace",
+            textTransform: 'uppercase',
+            letterSpacing: '0.05em',
             cursor: 'pointer',
             whiteSpace: 'nowrap',
           }}
         >
-          LAUNCH 3-DEVICE DEMO →
+          OPEN MULTI-NODE CONSOLE →
         </button>
       </div>
 
