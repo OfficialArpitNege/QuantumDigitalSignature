@@ -97,7 +97,10 @@ export default function Nav() {
             </button>
 
             <button
-              onClick={() => navigate('/simulator')}
+              onClick={() => {
+                window.scrollTo({ top: 0, left: 0, behavior: 'instant' });
+                navigate('/simulator');
+              }}
               style={{
                 padding: '6px 14px',
                 borderRadius: 2,

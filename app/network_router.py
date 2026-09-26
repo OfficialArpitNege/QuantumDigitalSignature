@@ -21,6 +21,7 @@ class TransmitRequest(BaseModel):
 class InterceptRequest(BaseModel):
     attack_type: str = "channel_manipulation"  # "none" | "channel_manipulation" | "phase_flip" | "replay" | "forgery" | "impersonation"
     attack_strength: float = 0.65
+    modified_message: Optional[str] = None
 
 import json
 import tempfile
@@ -147,11 +148,25 @@ def attacker_intercept(req: InterceptRequest):
             "message_hash": session.message_hash,
         }
 
+    original_message = session.sender_data.get("message") or session.message
+    is_impersonation = (req.attack_type == "impersonation")
+    has_modified = bool(req.modified_message and req.modified_message.strip())
+
+    if req.attack_type == "none":
+        # Pass untouched - restore original sender message
+        session.message = original_message
+        session.message_hash = sha256_bytes(session.message).hex()
+    elif has_modified:
+        session.message = req.modified_message.strip()
+        session.message_hash = sha256_bytes(session.message).hex()
+
     session.attacker_data = {
         "status": "intercepted" if req.attack_type != "none" else "passed",
         "attack_type": req.attack_type,
         "attack_strength": req.attack_strength,
         "intercepted_at": time.time(),
+        "original_message": original_message,
+        "modified_message": session.message if (is_impersonation or has_modified) else None,
     }
     session.status = "INTERCEPTED"
     session._save()

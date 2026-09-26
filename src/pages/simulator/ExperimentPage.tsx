@@ -17,6 +17,8 @@ export default function ExperimentPage() {
     handleScenarioSelect,
     message,
     setMessage,
+    impersonatedMessage,
+    setImpersonatedMessage,
     attackStrength,
     setAttackStrength,
     shots,
@@ -146,6 +148,8 @@ export default function ExperimentPage() {
         <AliceBobConsole
           message={message}
           setMessage={setMessage}
+          impersonatedMessage={impersonatedMessage}
+          setImpersonatedMessage={setImpersonatedMessage}
           scenarioAttack={scenarioAttack}
           attackStrength={attackStrength}
           setAttackStrength={setAttackStrength}

@@ -33,6 +33,7 @@ export default function DistributedNetworkPage() {
   // Attacker inputs
   const [selectedAttack, setSelectedAttack] = useState('forgery');
   const [attackStrength, setAttackStrength] = useState(0.65);
+  const [impersonatedMsg, setImpersonatedMsg] = useState('');
 
   const pollIntervalRef = useRef<any>(null);
 
@@ -85,9 +86,14 @@ export default function DistributedNetworkPage() {
   const handleIntercept = async (typeOverride?: string) => {
     setActionLoading(true);
     try {
+      const targetAttack = typeOverride || selectedAttack;
+      const isImpersonating = targetAttack === 'impersonation';
+      const modified = isImpersonating ? (impersonatedMsg.trim() || undefined) : undefined;
+
       const res = await api.interceptNetworkSession({
-        attack_type: typeOverride || selectedAttack,
+        attack_type: targetAttack,
         attack_strength: attackStrength,
+        modified_message: modified,
       });
       setState(res);
     } catch (e: any) {
@@ -115,6 +121,7 @@ export default function DistributedNetworkPage() {
     try {
       const res = await api.resetNetworkSession();
       setState(res);
+      setImpersonatedMsg('');
     } catch (e: any) {
       alert('Reset error: ' + e.message);
     } finally {
@@ -529,9 +536,13 @@ export default function DistributedNetworkPage() {
                 fontSize: 12,
               }}>
                 <div style={{ fontWeight: 800, color: '#B45309', marginBottom: 4 }}>
-                  [CHANNEL STATUS] QUANTUM PAYLOAD DETECTED IN TRANSIT
+                  [CHANNEL STATUS] {selectedAttack === 'impersonation' ? 'ATTACKER TRANSMISSION MODE ACTIVE' : 'QUANTUM PAYLOAD DETECTED IN TRANSIT'}
                 </div>
-                <div><b>Intercepted Payload:</b> "{state?.message}"</div>
+                {selectedAttack === 'impersonation' ? (
+                  <div><b>Adversary Strategy:</b> Attacker (Eve) bypasses original sender payload and injects arbitrary spoofed message as the sender.</div>
+                ) : (
+                  <div><b>Intercepted Payload from Sender:</b> "{state?.sender?.message || state?.attacker?.original_message || state?.message}"</div>
+                )}
                 <div style={{ fontSize: 11, color: '#78350F', marginTop: 4 }}>
                   Session #{state?.session_id} · {state?.max_symbols} Quantum Symbols in Transit
                 </div>
@@ -577,6 +588,49 @@ export default function DistributedNetworkPage() {
                 </div>
               </div>
 
+              {/* Impersonation Message Edit & Spoof Box */}
+              {selectedAttack === 'impersonation' && (
+                <div style={{
+                  marginBottom: 20,
+                  padding: '16px 18px',
+                  background: '#FEF2F2',
+                  border: '2px solid #DC2626',
+                  boxShadow: '3px 3px 0px #DC2626',
+                  borderRadius: 2,
+                  animation: 'qds-appear 0.2s ease',
+                }}>
+                  <div style={{ marginBottom: 10 }}>
+                    <div style={{ fontSize: 11, fontWeight: 900, color: '#991B1B', fontFamily: "'JetBrains Mono', monospace", letterSpacing: '0.06em' }}>
+                      👤 IMPERSONATION: ENTER ADVERSARY'S MESSAGE (ACT AS SENDER)
+                    </div>
+                  </div>
+
+                  <div>
+                    <label style={{ display: 'block', fontSize: 10, fontWeight: 800, color: '#991B1B', marginBottom: 6, fontFamily: "'JetBrains Mono', monospace" }}>
+                      IMPERSONATED / FORGED MESSAGE PAYLOAD:
+                    </label>
+                    <textarea
+                      value={impersonatedMsg}
+                      onChange={(e) => setImpersonatedMsg(e.target.value)}
+                      rows={2}
+                      placeholder="Enter attacker's custom message (e.g. AUTHORIZE PAYMENT TO EVE)..."
+                      style={{
+                        width: '100%',
+                        padding: '10px 14px',
+                        border: '1.5px solid #0F0F0F',
+                        borderRadius: 2,
+                        fontFamily: "'JetBrains Mono', monospace",
+                        fontSize: 13,
+                        fontWeight: 700,
+                        background: '#FFFFFF',
+                        boxSizing: 'border-box',
+                        color: '#0F0F0F',
+                      }}
+                    />
+                  </div>
+                </div>
+              )}
+
               <div style={{ marginBottom: 20 }}>
                 <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 11, fontWeight: 800, marginBottom: 6, fontFamily: "'JetBrains Mono', monospace" }}>
                   <span>ATTACK INTENSITY / NOISE (STRENGTH):</span>
@@ -610,7 +664,11 @@ export default function DistributedNetworkPage() {
                     cursor: 'pointer',
                   }}
                 >
-                  {actionLoading ? 'INJECTING...' : 'EXECUTE CHANNEL PERTURBATION'}
+                  {actionLoading
+                    ? 'INJECTING...'
+                    : selectedAttack === 'impersonation'
+                    ? 'EXECUTE IMPERSONATION & FORWARD SPOOFED MSG'
+                    : 'EXECUTE CHANNEL PERTURBATION'}
                 </button>
 
                 <button
@@ -644,7 +702,20 @@ export default function DistributedNetworkPage() {
                   fontSize: 11.5,
                   color: '#991B1B',
                 }}>
-                  <b>[CHANNEL PERTURBED]:</b> Applied <b>{state.attacker.attack_type}</b> ({((state.attacker.attack_strength || 0) * 100).toFixed(0)}% strength). Forwarded to Node 03 (Receiver).
+                  {state.attacker.attack_type === 'impersonation' ? (
+                    <div>
+                      <div style={{ fontWeight: 800, marginBottom: 4 }}>
+                        [IMPERSONATION INJECTED — IDENTITY SPOOFED]:
+                      </div>
+                      <div>
+                        Eve is pretending to be <b>Node 01 (Alice)</b>. Forwarded forged payload: <b>"{state.message}"</b> to Node 03 (Receiver).
+                      </div>
+                    </div>
+                  ) : (
+                    <div>
+                      <b>[CHANNEL PERTURBED]:</b> Applied <b>{state.attacker.attack_type}</b> ({((state.attacker.attack_strength || 0) * 100).toFixed(0)}% strength). Forwarded to Node 03 (Receiver).
+                    </div>
+                  )}
                 </div>
               )}
 
@@ -710,18 +781,9 @@ export default function DistributedNetworkPage() {
                 fontFamily: "'JetBrains Mono', monospace",
                 fontSize: 12,
               }}>
-                <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 4 }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between' }}>
                   <span><b>Incoming Payload:</b> "{state?.message}"</span>
                   <span style={{ color: '#555' }}>Session #{state?.session_id}</span>
-                </div>
-                <div style={{ fontSize: 11, color: '#666' }}>
-                  Channel Status: {state?.attacker?.status === 'intercepted' ? (
-                    <b style={{ color: '#DC2626' }}>[PERTURBATION LOGGED] Channel modified by Adversary</b>
-                  ) : state?.attacker?.status === 'passed' ? (
-                    <b style={{ color: '#10B981' }}>[CLEAN TRANSMISSION] State intact</b>
-                  ) : (
-                    <span>Awaiting Attacker or Direct Measure</span>
-                  )}
                 </div>
               </div>
 

@@ -4,6 +4,8 @@ import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, Legend } fro
 
 interface Props {
   results: ExperimentSymbolResult[];
+  hideMetrics?: boolean;
+  qberProxy?: number;
 }
 
 function blochChartData(results: ExperimentSymbolResult[]) {
@@ -19,14 +21,14 @@ function blochChartData(results: ExperimentSymbolResult[]) {
   }));
 }
 
-export default function QuantumTeleportation({ results }: Props) {
+export default function QuantumTeleportation({ results, hideMetrics = false, qberProxy: qberProp }: Props) {
   if (!results.length) return null;
 
   const first = results[0];
   const avgFidelity = results.reduce((s, r) => s + r.fidelity, 0) / results.length;
-  const qberProxy = results.filter(r =>
-    (r.observed.Z >= 0) !== (r.expected.Z >= 0)
-  ).length / results.length;
+  const calculatedQber = typeof qberProp === 'number'
+    ? qberProp
+    : Math.max(0, 1 - avgFidelity);
 
   const chartData = blochChartData(results);
 
@@ -34,26 +36,28 @@ export default function QuantumTeleportation({ results }: Props) {
     <div className="card section">
       <div style={{ marginBottom: 16 }}>
         <div className="section-label">Quantum Channel</div>
-        <div className="section-title">Quantum Teleportation</div>
+        <div className="section-title">Bloch Sphere Telemetry &amp; State Reconstructions</div>
         <div className="section-sub">Bell pair generation, teleportation and state reconstruction per symbol</div>
       </div>
 
-      {/* Key metrics */}
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 12, marginBottom: 20 }}>
-        {[
-          { label: 'Avg. Fidelity',        value: `${(avgFidelity * 100).toFixed(2)}%`, highlight: avgFidelity > 0.9 },
-          { label: 'QBER Proxy',           value: `${(qberProxy * 100).toFixed(1)}%`,   highlight: qberProxy < 0.1 },
-          { label: 'Symbols Teleported',   value: String(results.length) },
-          { label: 'Bell Measurement (1st)', value: first.bell_measurement, mono: true },
-        ].map(({ label, value, highlight, mono }) => (
-          <div key={label} className="metric-card" style={highlight ? { borderColor: 'var(--blue-300)', background: 'var(--blue-50)' } : {}}>
-            <div className="metric-label">{label}</div>
-            <div className="metric-value" style={{ fontSize: 22, fontFamily: mono ? "'JetBrains Mono', monospace" : undefined }}>
-              {value}
+      {/* Key metrics - only displayed when not hidden */}
+      {!hideMetrics && (
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 12, marginBottom: 20 }}>
+          {[
+            { label: 'Avg. Fidelity',        value: `${(avgFidelity * 100).toFixed(2)}%`, highlight: avgFidelity > 0.9 },
+            { label: 'QBER Proxy',           value: `${(calculatedQber * 100).toFixed(1)}%`,   highlight: calculatedQber < 0.1 },
+            { label: 'Symbols Teleported',   value: String(results.length) },
+            { label: 'Bell Measurement (1st)', value: first.bell_measurement, mono: true },
+          ].map(({ label, value, highlight, mono }) => (
+            <div key={label} className="metric-card" style={highlight ? { borderColor: 'var(--blue-300)', background: 'var(--blue-50)' } : {}}>
+              <div className="metric-label">{label}</div>
+              <div className="metric-value" style={{ fontSize: 22, fontFamily: mono ? "'JetBrains Mono', monospace" : undefined }}>
+                {value}
+              </div>
             </div>
-          </div>
-        ))}
-      </div>
+          ))}
+        </div>
+      )}
 
       {/* Bloch expectations chart */}
       <div style={{ marginBottom: 16 }}>

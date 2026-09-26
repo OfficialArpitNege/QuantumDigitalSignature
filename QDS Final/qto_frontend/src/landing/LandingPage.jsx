@@ -40,6 +40,11 @@ export default function LandingPage() {
     });
   };
 
+  const launchSimulator = () => {
+    window.scrollTo({ top: 0, left: 0, behavior: 'instant' });
+    navigate('/simulator');
+  };
+
   return (
     <div className="landing-root">
       <Nav />
@@ -61,7 +66,7 @@ export default function LandingPage() {
                   Explore Pipeline ↓
                 </button>
                 <button
-                  onClick={() => navigate('/simulator')}
+                  onClick={launchSimulator}
                   className="cta-button"
                   style={{
                     background: '#1D4ED8',
@@ -226,7 +231,7 @@ export default function LandingPage() {
               Legitimate communication is accepted, while anomalous behaviour is detected, classified, and recorded in a tamper-evident audit layer for defense, government, and financial operations.
             </p>
             <button
-              onClick={() => navigate('/simulator')}
+              onClick={launchSimulator}
               className="cta-button"
               style={{
                 background: '#1D4ED8',

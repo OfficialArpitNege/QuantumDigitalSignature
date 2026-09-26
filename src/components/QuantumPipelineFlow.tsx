@@ -1,32 +1,40 @@
+interface StepDef {
+  label: string;
+  sub: string;
+  phase: 'CLASSICAL' | 'TELEPORTATION' | 'THREAT DETECTION';
+}
+
 export default function QuantumPipelineFlow() {
-  const steps = [
-    { label: 'MESSAGE', sub: 'Input payload' },
-    { label: 'SHA-256', sub: 'Message Digest' },
-    { label: 'SIGNING MATERIAL', sub: 'HMAC-SHA256' },
-    { label: 'QUBIT ENCODING', sub: 'State prep' },
-    { label: 'BELL PAIR', sub: '|Φ⁺⟩ Entangled' },
-    { label: 'TELEPORT', sub: 'Quantum Channel' },
-    { label: 'MEASURE', sub: 'Bell Basis' },
-    { label: 'RECONSTRUCT', sub: 'Receiver\'s State' },
+  const steps: StepDef[] = [
+    { label: 'MESSAGE', sub: 'Input Payload', phase: 'CLASSICAL' },
+    { label: 'SHA-256', sub: 'Message Digest', phase: 'CLASSICAL' },
+    { label: 'SIGNING MATERIAL', sub: 'HMAC-SHA256 Layer', phase: 'CLASSICAL' },
+    { label: 'QUBIT ENCODING', sub: 'Pauli Eigenstates', phase: 'TELEPORTATION' },
+    { label: 'BELL PAIR', sub: '|Φ⁺⟩ Entanglement', phase: 'TELEPORTATION' },
+    { label: 'BSM MEASURE', sub: 'Bell State Basis', phase: 'TELEPORTATION' },
+    { label: 'RECONSTRUCT', sub: 'Pauli Corrections', phase: 'TELEPORTATION' },
+    { label: 'PROJECTIVE BASIS', sub: 'Quantum Measurement', phase: 'THREAT DETECTION' },
+    { label: 'THREAT DETECTION', sub: 'Fidelity & QBER Gates', phase: 'THREAT DETECTION' },
+    { label: 'VERIFICATION', sub: 'Deterministic Decision', phase: 'THREAT DETECTION' },
   ];
 
   return (
-    <div className="lab-glass-shell" style={{ padding: '24px 28px', marginBottom: 24 }}>
+    <div className="lab-glass-shell" style={{ padding: '22px 26px', marginBottom: 24 }}>
       <div style={{
         fontSize: 11,
         fontWeight: 800,
         textTransform: 'uppercase',
-        letterSpacing: '0.12em',
-        color: '#cc0000',
+        letterSpacing: '0.1em',
+        color: '#0F0F0F',
         marginBottom: 16,
-        fontFamily: "'IBM Plex Mono', monospace",
+        fontFamily: "'JetBrains Mono', monospace",
       }}>
-        QUANTUM PIPELINE LIFECYCLE
+        QUANTUM PIPELINE LIFECYCLE (TELEPORTATION-BASED QDS &amp; THREAT DETECTION)
       </div>
 
       <div style={{
         display: 'grid',
-        gridTemplateColumns: 'repeat(auto-fit, minmax(110px, 1fr))',
+        gridTemplateColumns: 'repeat(auto-fit, minmax(115px, 1fr))',
         gap: 10,
         position: 'relative',
       }}>
@@ -34,47 +42,68 @@ export default function QuantumPipelineFlow() {
           <div
             key={step.label}
             style={{
-              background: 'var(--lab-surface-2)',
-              border: '1px solid var(--lab-border)',
-              borderRadius: 12,
+              background: '#FFFFFF',
+              border: '1.5px solid #E2E8F0',
+              borderRadius: 6,
               padding: '12px 10px',
               textAlign: 'center',
               position: 'relative',
-              boxShadow: '0 4px 12px rgba(0,0,0,0.03)',
+              boxShadow: '0 1px 3px rgba(0,0,0,0.03)',
+              display: 'flex',
+              flexDirection: 'column',
+              justifyContent: 'space-between',
+              minHeight: 118,
             }}
           >
-            <div style={{
-              fontSize: 9,
-              fontWeight: 800,
-              color: '#cc0000',
-              marginBottom: 4,
-              fontFamily: "'JetBrains Mono', monospace",
-            }}>
-              STEP 0{idx + 1}
+            <div>
+              <span style={{
+                fontSize: 8,
+                fontWeight: 800,
+                color: '#64748B',
+                background: '#F1F5F9',
+                padding: '2px 6px',
+                borderRadius: 3,
+                fontFamily: "'JetBrains Mono', monospace",
+                textTransform: 'uppercase',
+                letterSpacing: '0.04em',
+                display: 'inline-block',
+                marginBottom: 6,
+              }}>
+                {step.phase}
+              </span>
+
+              <div style={{
+                fontSize: 10,
+                fontWeight: 800,
+                color: '#0F0F0F',
+                marginBottom: 4,
+                fontFamily: "'JetBrains Mono', monospace",
+                letterSpacing: '0.05em',
+              }}>
+                STEP {idx < 9 ? '0' : ''}{idx + 1}
+              </div>
+
+              <div style={{
+                fontSize: 11,
+                fontWeight: 800,
+                color: '#0F0F0F',
+                marginBottom: 4,
+                letterSpacing: '0.02em',
+                lineHeight: 1.25,
+                fontFamily: "'Space Grotesk', sans-serif",
+              }}>
+                {step.label}
+              </div>
             </div>
-            <div style={{
-              fontSize: 11,
-              fontWeight: 800,
-              color: 'var(--lab-text)',
-              marginBottom: 2,
-              letterSpacing: '0.02em',
-            }}>
-              {step.label}
-            </div>
+
             <div style={{
               fontSize: 10,
-              color: 'var(--lab-text-sub)',
+              color: '#64748B',
+              lineHeight: 1.3,
+              fontFamily: "'JetBrains Mono', monospace",
             }}>
               {step.sub}
             </div>
-
-            {idx < steps.length - 1 && (
-              <div
-                style={{
-                  display: 'none', // handled by grid spacing/responsive layout
-                }}
-              />
-            )}
           </div>
         ))}
       </div>

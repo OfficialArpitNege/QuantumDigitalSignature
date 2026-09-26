@@ -23,7 +23,7 @@ export default function QuantumDataPage() {
   }
 
   const avgFidelity = qtx?.average_fidelity ?? (results.length > 0 ? results.reduce((s, r) => s + r.fidelity, 0) / results.length : 1.0);
-  const qberProxy = stats?.qber_proxy ?? (experimentData?.attack === 'channel_manipulation' ? 0.5 : 0.0);
+  const qberProxy = stats?.qber_proxy ?? (typeof avgFidelity === 'number' ? Math.max(0, 1 - avgFidelity) : (experimentData?.attack === 'channel_manipulation' ? 0.5 : 0.0));
   const symbolCount = qtx?.qubits_transmitted ?? results.length ?? 4;
 
   return (
@@ -46,7 +46,7 @@ export default function QuantumDataPage() {
       <QuantumPipelineFlow />
 
       {/* ══════════════════════════════════════════════════
-          2. QUANTUM CHANNEL METRICS SUMMARY CARD
+          2. QUANTUM CHANNEL METRICS SUMMARY CARD (AUTHORITATIVE REAL QBER)
       ══════════════════════════════════════════════════ */}
       <div className="lab-glass-shell" style={{ padding: '24px 28px', marginBottom: 24 }}>
         <div style={{
@@ -66,8 +66,8 @@ export default function QuantumDataPage() {
           </div>
 
           <div className="metric-card" style={{ background: 'var(--lab-surface-2)' }}>
-            <div className="metric-label">QBER Proxy</div>
-            <div className="metric-value" style={{ fontSize: 24, color: qberProxy === 0 ? '#10b981' : '#ef4444' }}>
+            <div className="metric-label">QBER Proxy (Error Rate)</div>
+            <div className="metric-value" style={{ fontSize: 24, color: qberProxy <= 0.05 ? '#10b981' : '#ef4444' }}>
               {(qberProxy * 100).toFixed(1)}%
             </div>
           </div>
@@ -92,7 +92,7 @@ export default function QuantumDataPage() {
           3. BLOCH EXPECTATIONS CHART & SYMBOL DETAIL TABLE
       ══════════════════════════════════════════════════ */}
       {results.length > 0 ? (
-        <QuantumTeleportation results={results} />
+        <QuantumTeleportation results={results} hideMetrics={true} qberProxy={qberProxy} />
       ) : (
         <div className="lab-glass-shell" style={{ padding: '24px 28px', marginBottom: 24 }}>
           <div style={{ fontSize: 13, color: 'var(--lab-text-sub)', textAlign: 'center', padding: '20px 0' }}>

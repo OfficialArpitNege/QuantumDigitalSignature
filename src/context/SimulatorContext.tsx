@@ -28,6 +28,8 @@ interface SimulatorContextType {
   setScenarioAttack: (a: ExtendedAttackType) => void;
   message: string;
   setMessage: (m: string) => void;
+  impersonatedMessage: string;
+  setImpersonatedMessage: (m: string) => void;
   shots: number;
   setShots: (s: number) => void;
   maxSymbols: number;
@@ -78,6 +80,7 @@ export const SimulatorProvider: React.FC<{ children: React.ReactNode }> = ({ chi
   // Config
   const [scenarioAttack, setScenarioAttack] = useState<ExtendedAttackType>('none');
   const [message, setMessage] = useState('HELLO QUANTUM');
+  const [impersonatedMessage, setImpersonatedMessage] = useState('');
   const [shots, setShots] = useState(2048);
   const [maxSymbols, setMaxSymbols] = useState(4);
   const [attackStrength, setAttackStrength] = useState(0.35);
@@ -182,6 +185,9 @@ export const SimulatorProvider: React.FC<{ children: React.ReactNode }> = ({ chi
 
   const handleScenarioSelect = useCallback((a: ExtendedAttackType) => {
     setScenarioAttack(a);
+    if (a !== 'impersonation') {
+      setImpersonatedMessage('');
+    }
     resetResults();
   }, [resetResults]);
 
@@ -192,8 +198,12 @@ export const SimulatorProvider: React.FC<{ children: React.ReactNode }> = ({ chi
     setPipeline({ stages: [{ status: 'active' }, ...Array(8).fill({ status: 'idle' })] });
 
     const attack = backendAttack();
+    const effectiveMsg = (attack === 'impersonation' && impersonatedMessage.trim())
+      ? impersonatedMessage.trim()
+      : message;
+
     const reqBody = {
-      message,
+      message: effectiveMsg,
       attack,
       attack_strength: attackStrength,
       shots,
@@ -288,6 +298,7 @@ export const SimulatorProvider: React.FC<{ children: React.ReactNode }> = ({ chi
       value={{
         scenarioAttack, setScenarioAttack,
         message, setMessage,
+        impersonatedMessage, setImpersonatedMessage,
         shots, setShots,
         maxSymbols, setMaxSymbols,
         attackStrength, setAttackStrength,

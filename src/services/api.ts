@@ -66,7 +66,7 @@ export const api = {
   resetNetworkSession: () => post<any>('/api/v1/network/reset', {}),
   transmitNetworkSession: (body: { message: string; shots?: number; max_symbols?: number }) =>
     post<any>('/api/v1/network/transmit', body),
-  interceptNetworkSession: (body: { attack_type: string; attack_strength?: number }) =>
+  interceptNetworkSession: (body: { attack_type: string; attack_strength?: number; modified_message?: string }) =>
     post<any>('/api/v1/network/intercept', body),
   verifyNetworkSession: () => post<any>('/api/v1/network/verify', {}),
 };

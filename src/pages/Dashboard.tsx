@@ -44,6 +44,7 @@ export default function Dashboard() {
   // ── Scenario / config state ──────────────────────────────
   const [scenarioAttack, setScenarioAttack] = useState<ExtendedAttackType>('none');
   const [message, setMessage] = useState('HELLO QUANTUM');
+  const [impersonatedMessage, setImpersonatedMessage] = useState('');
   const [shots, setShots] = useState(2048);
   const [maxSymbols, setMaxSymbols] = useState(4);
   const [attackStrength, setAttackStrength] = useState(0.35);
@@ -136,6 +137,9 @@ export default function Dashboard() {
 
   const handleScenarioSelect = useCallback((a: ExtendedAttackType) => {
     setScenarioAttack(a);
+    if (a !== 'impersonation') {
+      setImpersonatedMessage('');
+    }
     resetResults();
   }, [resetResults]);
 
@@ -147,8 +151,12 @@ export default function Dashboard() {
 
     try {
       const attack = backendAttack();
+      const effectiveMsg = (attack === 'impersonation' && impersonatedMessage.trim())
+        ? impersonatedMessage.trim()
+        : message;
+
       const reqBody = {
-        message,
+        message: effectiveMsg,
         attack,
         attack_strength: attackStrength,
         shots,
@@ -163,7 +171,7 @@ export default function Dashboard() {
         : reqBody;
 
       Promise.all([
-        api.signMessage({ message, max_symbols: maxSymbols }),
+        api.signMessage({ message: effectiveMsg, max_symbols: maxSymbols }),
         api.runExperiment(experimentAttack),
       ]).then(([signRes, expRes]) => {
         setSignData(signRes);
@@ -273,6 +281,8 @@ export default function Dashboard() {
             <AliceBobConsole
               message={message}
               setMessage={setMessage}
+              impersonatedMessage={impersonatedMessage}
+              setImpersonatedMessage={setImpersonatedMessage}
               scenarioAttack={scenarioAttack}
               attackStrength={attackStrength}
               setAttackStrength={setAttackStrength}

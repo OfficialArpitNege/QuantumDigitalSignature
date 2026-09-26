@@ -4,6 +4,8 @@ import type { ProtocolVerificationResult } from '../../types/api';
 interface Props {
   message: string;
   setMessage: (msg: string) => void;
+  impersonatedMessage?: string;
+  setImpersonatedMessage?: (msg: string) => void;
   scenarioAttack: ExtendedAttackType;
   attackStrength: number;
   setAttackStrength: (val: number) => void;
@@ -23,6 +25,8 @@ interface Props {
 export default function AliceBobConsole({
   message,
   setMessage,
+  impersonatedMessage = '',
+  setImpersonatedMessage,
   scenarioAttack,
   attackStrength,
   setAttackStrength,
@@ -42,11 +46,16 @@ export default function AliceBobConsole({
 
   // Compute Bob's received payload representation based on simulation state & attack scenario
   const getBobReceivedPayload = () => {
-    if (!message.trim()) return '(empty message)';
-    if (!isDone) return message;
+    const isImpersonating = scenarioAttack === 'impersonation';
+    const effectiveMsg = (isImpersonating && impersonatedMessage?.trim())
+      ? impersonatedMessage.trim()
+      : message;
+
+    if (!effectiveMsg.trim()) return '(empty message)';
+    if (!isDone) return effectiveMsg;
 
     if (verdict === 'ACCEPT' || scenarioAttack === 'none') {
-      return message;
+      return effectiveMsg;
     }
 
     switch (scenarioAttack) {
@@ -55,7 +64,7 @@ export default function AliceBobConsole({
       case 'replay':
         return `${message} [REPLAYED NONCE]`;
       case 'impersonation':
-        return `${message} [UNAUTHORIZED SENDER]`;
+        return `${impersonatedMessage?.trim() || message} [UNAUTHORIZED SENDER]`;
       case 'channel_manipulation':
         return (
           message
@@ -214,6 +223,52 @@ export default function AliceBobConsole({
         </div>
       )}
 
+      {/* Impersonation Message Edit & Spoof Box */}
+      {scenarioAttack === 'impersonation' && (
+        <div
+          style={{
+            marginBottom: 16,
+            padding: '16px 18px',
+            background: '#FEF2F2',
+            border: '2px solid #DC2626',
+            boxShadow: '3px 3px 0px #DC2626',
+            borderRadius: 2,
+            animation: 'qds-appear 0.2s ease',
+          }}
+        >
+          <div style={{ marginBottom: 10 }}>
+            <div style={{ fontSize: 11, fontWeight: 900, color: '#991B1B', fontFamily: "'JetBrains Mono', monospace", letterSpacing: '0.06em' }}>
+              👤 IMPERSONATION: ENTER ADVERSARY'S MESSAGE (ACT AS SENDER)
+            </div>
+          </div>
+
+          <div>
+            <label style={{ display: 'block', fontSize: 10, fontWeight: 800, color: '#991B1B', marginBottom: 6, fontFamily: "'JetBrains Mono', monospace" }}>
+              IMPERSONATED / FORGED MESSAGE PAYLOAD:
+            </label>
+            <textarea
+              id="impersonation-message-input"
+              value={impersonatedMessage}
+              onChange={(e) => setImpersonatedMessage?.(e.target.value)}
+              rows={2}
+              placeholder="Enter attacker's custom message (e.g. AUTHORIZE PAYMENT TO EVE)..."
+              style={{
+                width: '100%',
+                padding: '10px 14px',
+                border: '1.5px solid #0F0F0F',
+                borderRadius: 2,
+                fontFamily: "'JetBrains Mono', monospace",
+                fontSize: 13,
+                fontWeight: 700,
+                background: '#FFFFFF',
+                boxSizing: 'border-box',
+                color: '#0F0F0F',
+              }}
+            />
+          </div>
+        </div>
+      )}
+
       {/* DUAL PANELS: SENDER | RECEIVER */}
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: 12 }}>
         {/* 👩‍💻 SENDER PANEL */}
@@ -239,14 +294,14 @@ export default function AliceBobConsole({
                 style={{
                   fontSize: 9,
                   fontWeight: 800,
-                  background: '#dbeafe',
-                  color: '#1d4ed8',
+                  background: scenarioAttack === 'impersonation' ? '#fee2e2' : '#dbeafe',
+                  color: scenarioAttack === 'impersonation' ? '#b91c1c' : '#1d4ed8',
                   padding: '2px 8px',
                   borderRadius: 10,
                   fontFamily: "'JetBrains Mono', monospace",
                 }}
               >
-                READY
+                {scenarioAttack === 'impersonation' ? 'SPOOFED BY EVE' : 'READY'}
               </span>
             </div>
 
@@ -272,12 +327,17 @@ export default function AliceBobConsole({
                 outline: 'none',
               }}
             />
+            {scenarioAttack === 'impersonation' && (
+              <div style={{ fontSize: 10, color: '#dc2626', fontFamily: "'JetBrains Mono', monospace", marginTop: 4, fontWeight: 700 }}>
+                ⚠️ Adversary (Eve) is hijacking transmission as sender using the payload configured above.
+              </div>
+            )}
           </div>
 
           <button
             id="run-protocol-btn"
             onClick={onRunProtocol}
-            disabled={loading || !message.trim()}
+            disabled={loading || (scenarioAttack === 'impersonation' ? (!impersonatedMessage.trim() && !message.trim()) : !message.trim())}
             className="lab-transmit-btn"
             style={{
               width: '100%',
@@ -287,7 +347,7 @@ export default function AliceBobConsole({
               fontWeight: 800,
               color: '#ffffff',
               border: 'none',
-              cursor: loading || !message.trim() ? 'not-allowed' : 'pointer',
+              cursor: loading || (scenarioAttack === 'impersonation' ? (!impersonatedMessage.trim() && !message.trim()) : !message.trim()) ? 'not-allowed' : 'pointer',
               background: loading
                 ? '#64748b'
                 : scenarioAttack === 'none'
@@ -299,10 +359,16 @@ export default function AliceBobConsole({
             {loading ? (
               <>
                 <span style={{ animation: 'qds-spin 0.7s linear infinite', display: 'inline-block' }}>⚙</span>{' '}
-                Transmitting...
+                {scenarioAttack === 'impersonation' ? 'Transmitting as Impersonated Sender...' : 'Transmitting...'}
               </>
             ) : (
-              <>▶ TRANSMIT TO RECEIVER {scenarioAttack !== 'none' ? `(+ ${scenarioAttack.toUpperCase()})` : ''}</>
+              <>
+                {scenarioAttack === 'impersonation'
+                  ? '▶ TRANSMIT AS IMPERSONATED SENDER (+ IMPERSONATION)'
+                  : scenarioAttack !== 'none'
+                  ? `▶ TRANSMIT TO RECEIVER (+ ${scenarioAttack.toUpperCase()})`
+                  : '▶ TRANSMIT TO RECEIVER'}
+              </>
             )}
           </button>
         </div>
@@ -412,7 +478,7 @@ export default function AliceBobConsole({
                 </span>
               ) : !isDone ? (
                 <span style={{ fontStyle: 'italic', fontSize: 12, color: '#94a3b8' }}>
-                  Waiting for Sender...
+                  {scenarioAttack === 'impersonation' ? 'Waiting for Impersonated Sender...' : 'Waiting for Sender...'}
                 </span>
               ) : (
                 <span>{bobPayload}</span>
